@@ -20,7 +20,7 @@ El proyecto se basa en una arquitectura moderna y *serverless*:
 *   **Frontend:** React (Next.js) + Tailwind CSS.
 *   **Backend & DB:** Firebase (Firestore, Auth, Cloud Functions).
 *   **Lenguaje:** TypeScript.
-*   **Herramientas:** Jira (Gestión), GitHub (Control de versiones).
+*   **Herramientas:** Trello (Gestión), GitHub (Control de versiones).
 
 ## 📅 Estado del Proyecto
 
