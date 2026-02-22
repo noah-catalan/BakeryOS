@@ -1,185 +1,291 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { collection, onSnapshot, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import {
-  TrendingUp,
-  Package,
-  ShoppingCart,
-  AlertTriangle,
-  ArrowUpRight,
-  ArrowDownRight,
-  Clock
+  TrendingUp, Package, Clock, AlertTriangle,
+  ShoppingCart, CheckCircle, ChefHat, ArrowRight
 } from "lucide-react";
+import Link from "next/link";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-const salesData = [
-  { name: 'Lun', ventas: 1200, costes: 800 },
-  { name: 'Mar', ventas: 1400, costes: 900 },
-  { name: 'Mié', ventas: 1100, costes: 750 },
-  { name: 'Jue', ventas: 1800, costes: 1100 },
-  { name: 'Vie', ventas: 2200, costes: 1300 },
-  { name: 'Sáb', ventas: 2800, costes: 1500 },
-  { name: 'Dom', ventas: 3100, costes: 1600 },
-];
-
-const recentActivity = [
-  { id: 1, action: "Producción completada", item: "Pan de Masa Madre (x50)", time: "hace 10 min", icon: Package, color: "text-emerald-500", bg: "bg-emerald-50" },
-  { id: 2, action: "Nuevo pedido", item: "Cafetería Central (#1024)", time: "hace 45 min", icon: ShoppingCart, color: "text-blue-500", bg: "bg-blue-50" },
-  { id: 3, action: "Alerta de stock", item: "Harina de Fuerza (Quedan 5kg)", time: "hace 2 horas", icon: AlertTriangle, color: "text-red-500", bg: "bg-red-50" },
-  { id: 4, action: "Producción iniciada", item: "Croissants (x120)", time: "hace 3 horas", icon: Clock, color: "text-amber-500", bg: "bg-amber-50" },
-];
+import { Invoice } from "@/types/billing";
+import { SaleOrder } from "@/types/clients";
+import { ProductionOrder } from "@/types/production";
+import { Ingredient } from "@/types/inventory";
 
 export default function Home() {
+  // KPI Data
+  const [ingresosMes, setIngresosMes] = useState(0);
+  const [pedidosPendientes, setPedidosPendientes] = useState(0);
+  const [ordenesEnProceso, setOrdenesEnProceso] = useState(0);
+  const [alertasStock, setAlertasStock] = useState<Ingredient[]>([]);
+  const [ultimosPedidos, setUltimosPedidos] = useState<SaleOrder[]>([]);
+
+  // For Chart
+  const [salesData, setSalesData] = useState<{ name: string, ventas: number }[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 1. Ingresos y Gráfico
+    const unsubscribeFacturas = onSnapshot(collection(db, "facturas"), (snapshot) => {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      let ingresos = 0;
+      const facturasValidas = snapshot.docs.map(doc => doc.data() as Invoice)
+        .filter(fac => (fac.estado === 'emitida' || fac.estado === 'pagada'));
+
+      // Calculate this month's revenue
+      facturasValidas.forEach(fac => {
+        if (fac.fechaEmision >= startOfMonth.getTime()) {
+          ingresos += fac.total;
+        }
+      });
+      setIngresosMes(ingresos);
+
+      // Calculate Last 7 Days for Chart
+      const chartMap = new Map();
+      const today = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toLocaleDateString('es-ES', { weekday: 'short' }); // "lun", "mar", etc.
+        chartMap.set(dateStr, 0);
+      }
+
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+
+      facturasValidas.forEach(fac => {
+        if (fac.fechaEmision >= sevenDaysAgo.getTime()) {
+          const facDateStr = new Date(fac.fechaEmision).toLocaleDateString('es-ES', { weekday: 'short' });
+          if (chartMap.has(facDateStr)) {
+            chartMap.set(facDateStr, chartMap.get(facDateStr) + fac.total);
+          }
+        }
+      });
+
+      const newChartData = Array.from(chartMap.entries()).map(([name, ventas]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        ventas
+      }));
+      setSalesData(newChartData);
+
+    });
+
+    // 2. Pedidos Pendientes & Últimos Pedidos
+    const unsubscribePedidos = onSnapshot(collection(db, "pedidosVenta"), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as SaleOrder[];
+
+      // Pending count
+      const pendientesCount = data.filter(p => p.estado === 'pendiente').length;
+      setPedidosPendientes(pendientesCount);
+
+      // Latest 5
+      data.sort((a, b) => b.fechaCreacion - a.fechaCreacion);
+      setUltimosPedidos(data.slice(0, 5));
+    });
+
+    // 3. Órdenes de Producción Activas
+    const unsubscribeProduccion = onSnapshot(collection(db, "ordenesProduccion"), (snapshot) => {
+      const data = snapshot.docs.map(doc => doc.data() as ProductionOrder);
+      const enProcesoCount = data.filter(o => o.estado === 'pendiente' || o.estado === 'enProceso').length;
+      setOrdenesEnProceso(enProcesoCount);
+    });
+
+    // 4. Inventario - Alertas de Stock
+    const unsubscribeInventario = onSnapshot(collection(db, "ingredientes"), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Ingredient[];
+      const kriticos = data.filter(ing => ing.stockActual <= ing.stockMinimo);
+      kriticos.sort((a, b) => (a.stockActual / a.stockMinimo) - (b.stockActual / b.stockMinimo));
+      setAlertasStock(kriticos);
+
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribeFacturas();
+      unsubscribePedidos();
+      unsubscribeProduccion();
+      unsubscribeInventario();
+    };
+  }, []);
+
+  if (loading) {
+    return <div className="p-8 text-center text-slate-500">Cargando tablero y métricas...</div>;
+  }
+
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900">Resumen General</h2>
-        <p className="text-sm text-slate-500 mt-1">Monitorea el estado actual de la panadería.</p>
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Panel de Control Operativo</h2>
+          <p className="text-sm text-slate-500 mt-1">Resumen de la actividad en tiempo real de BakeryOS.</p>
+        </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Card 1 */}
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-slate-500">Ingresos (Mes)</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">12,450€</h3>
-            </div>
-            <div className="p-2 bg-emerald-50 rounded-lg">
-              <TrendingUp size={20} className="text-emerald-600" />
-            </div>
+      {/* KPI GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
+          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+            <TrendingUp size={24} />
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="flex items-center text-emerald-600 font-medium">
-              <ArrowUpRight size={16} className="mr-1" />
-              +12.5%
-            </span>
-            <span className="text-slate-400 ml-2">vs mes anterior</span>
+          <div>
+            <p className="text-sm font-medium text-slate-500 mb-1">Ingresos (Mes)</p>
+            <h3 className="text-2xl font-bold text-slate-900">{ingresosMes.toFixed(2)}€</h3>
           </div>
         </div>
 
-        {/* Card 2 */}
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-slate-500">Pedidos Pendientes</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">14</h3>
-            </div>
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <ShoppingCart size={20} className="text-blue-600" />
-            </div>
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+            <ShoppingCart size={24} />
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-slate-500">
-              3 para entregar hoy
-            </span>
+          <div>
+            <p className="text-sm font-medium text-slate-500 mb-1">Pedidos Pendientes</p>
+            <h3 className="text-2xl font-bold text-slate-900">{pedidosPendientes}</h3>
           </div>
         </div>
 
-        {/* Card 3 */}
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-slate-500">Producción de Hoy</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">345</h3>
-            </div>
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <Package size={20} className="text-purple-600" />
-            </div>
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
+          <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
+            <ChefHat size={24} />
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <div className="w-full bg-slate-100 rounded-full h-2 mr-2">
-              <div className="bg-purple-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-            </div>
-            <span className="text-slate-500 font-medium text-xs">75%</span>
+          <div>
+            <p className="text-sm font-medium text-slate-500 mb-1">Producción en Curso</p>
+            <h3 className="text-2xl font-bold text-slate-900">{ordenesEnProceso}</h3>
           </div>
         </div>
 
-        {/* Card 4 */}
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-slate-500">Alertas Inventario</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">2</h3>
-            </div>
-            <div className="p-2 bg-red-50 rounded-lg">
-              <AlertTriangle size={20} className="text-red-600" />
-            </div>
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow" title={alertasStock.length > 0 ? "Requiere atención prioritaria" : "Inventario saludable"}>
+          <div className={`p-3 rounded-lg ${alertasStock.length > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-50 text-slate-400'}`}>
+            {alertasStock.length > 0 ? <AlertTriangle size={24} /> : <CheckCircle size={24} />}
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="flex items-center text-red-600 font-medium">
-              <ArrowDownRight size={16} className="mr-1" />
-              Requiere atención
-            </span>
+          <div>
+            <p className="text-sm font-medium text-slate-500 mb-1">Alertas Stock</p>
+            <h3 className={`text-2xl font-bold ${alertasStock.length > 0 ? 'text-red-600' : 'text-slate-900'}`}>{alertasStock.length}</h3>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Chart */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-slate-800">Flujo de Caja (Últimos 7 días)</h3>
-            <select className="text-sm rounded-md border-slate-200 text-slate-600 py-1.5 pl-3 pr-8 bg-slate-50 focus:ring-blue-500 focus:border-blue-500">
-              <option>Esta semana</option>
-              <option>Este mes</option>
-            </select>
+
+        {/* CHART & RECENT ORDERS */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Main Chart */}
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold text-slate-800">Facturación (Últimos 7 días)</h3>
+            </div>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={salesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dx={-10} tickFormatter={(value) => `${value}€`} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(value: any) => [`${value}€`]} />
+                  <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorVentas)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={salesData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorCostes" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dx={-10} tickFormatter={(value) => `${value}€`} />
-                <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ fontSize: '13px', fontWeight: 500 }}
-                  formatter={(value: any) => [`${value}€`]}
-                />
-                <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorVentas)" />
-                <Area type="monotone" dataKey="costes" name="Costes" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorCostes)" />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          {/* Últimos Pedidos */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <Clock className="text-blue-600" size={18} />
+                Últimos Pedidos de Venta
+              </h3>
+              <Link href="/clientes" className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                Ver todos <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="flex-1 p-0">
+              {ultimosPedidos.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 text-sm">No hay pedidos recientes en la base de datos.</div>
+              ) : (
+                <table className="min-w-full divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100">
+                    {ultimosPedidos.map((pedido) => (
+                      <tr key={pedido.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-900 w-1/3">
+                          {pedido.clienteNombre}
+                        </td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-slate-500">
+                          {new Date(pedido.fechaCreacion).toLocaleDateString()}
+                        </td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 text-right">
+                          {pedido.total.toFixed(2)}€
+                        </td>
+                        <td className="px-5 py-4 whitespace-nowrap text-right">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider
+                                                        ${pedido.estado === 'pendiente' ? 'bg-amber-100 text-amber-800' : ''}
+                                                        ${pedido.estado === 'entregado' ? 'bg-emerald-100 text-emerald-800' : ''}
+                                                        ${pedido.estado === 'cancelado' ? 'bg-red-100 text-red-800' : ''}
+                                                    `}>
+                            {pedido.estado}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">Actividad Reciente</h3>
-          <div className="space-y-6">
-            {recentActivity.map((activity) => {
-              const Icon = activity.icon;
-              return (
-                <div key={activity.id} className="flex gap-4">
-                  <div className={`mt-0.5 p-2 rounded-full h-fit flex-shrink-0 ${activity.bg}`}>
-                    <Icon size={16} className={activity.color} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">{activity.action}</p>
-                    <p className="text-sm text-slate-600 mt-0.5">{activity.item}</p>
-                    <p className="text-xs text-slate-400 mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              );
-            })}
+        {/* ALERTAS DE STOCK CRÍTICO */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-fit">
+          <div className="p-5 border-b border-red-50 flex items-center justify-between bg-red-50/30">
+            <h3 className="font-bold text-red-700 flex items-center gap-2">
+              <AlertTriangle size={18} />
+              Stock Crítico Prio.
+            </h3>
+            <Link href="/inventario" className="text-sm text-red-600 hover:text-red-800 font-medium">Revisar Repo.</Link>
           </div>
-          <button className="w-full mt-8 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors border border-blue-100 rounded-lg hover:bg-blue-50">
-            Ver toda la actividad
-          </button>
+          <div className="flex-1 p-0">
+            {alertasStock.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 text-sm flex flex-col items-center gap-2">
+                <CheckCircle className="text-emerald-500 mb-1" size={24} />
+                Inventario saludable.<br />Sin alertas de compra hoy.
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {alertasStock.slice(0, 8).map((ing) => (
+                  <li key={ing.id} className="p-4 hover:bg-slate-50 flex flex-col transition-colors border-l-4 border-red-400">
+                    <div className="flex justify-between items-start">
+                      <p className="font-bold text-slate-800 text-sm">{ing.nombre}</p>
+                      <p className="font-bold text-red-600">{ing.stockActual} <span className="text-xs font-normal">{ing.unidad}</span></p>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Min: {ing.stockMinimo} {ing.unidad}</span>
+                      <span className="text-xs font-medium text-red-500 uppercase tracking-tighter">Bajo Mínimos</span>
+                    </div>
+                  </li>
+                ))}
+                {alertasStock.length > 8 && (
+                  <li className="p-3 text-center bg-slate-50 border-t border-slate-100">
+                    <Link href="/inventario" className="text-xs font-bold text-slate-500 hover:text-red-600">
+                      + {alertasStock.length - 8} ingredientes más en alerta
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            )}
+          </div>
         </div>
+
       </div>
     </div>
   );
