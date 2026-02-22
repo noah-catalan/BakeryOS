@@ -4,6 +4,7 @@ export interface Ingredient {
     SKU: string;
     categoria: string;
     stockActual: number;
-    minimo: number;
+    stockMinimo: number;
+    unidad?: string;
     estado: 'ok' | 'bajo' | 'alerta';
 }

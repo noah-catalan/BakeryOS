@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, getDocs, writeBatch, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
   TrendingUp, Package, Clock, AlertTriangle,
@@ -115,17 +115,110 @@ export default function Home() {
     };
   }, []);
 
+  const handleSeedData = async () => {
+    if (!confirm("⚠️ ¿Estás seguro de que quieres BORRAR TODOS LOS DATOS (Ingredientes, Clientes, Recetas) preexistentes y generar el Demo realista?")) return;
+    setLoading(true);
+
+    try {
+      const batch = writeBatch(db);
+
+      // 1. Borrar colecciones actuales
+      const colsToClear = ["ingredientes", "clientes", "recetas"];
+      for (const colName of colsToClear) {
+        const snapshot = await getDocs(collection(db, colName));
+        snapshot.docs.forEach(d => {
+          batch.delete(doc(db, colName, d.id));
+        });
+      }
+
+      // 2. Poblar Ingredientes (6)
+      const demoIngredientes = [
+        { nombre: "Harina de Fuerza T80", SKU: "HAR-001", categoria: "Harinas", stockActual: 120, stockMinimo: 50, unidad: "kg", estado: "ok", ultimaAct: Date.now() },
+        { nombre: "Levadura Fresca", SKU: "LEV-001", categoria: "Levaduras", stockActual: 2, stockMinimo: 5, unidad: "kg", estado: "bajo", ultimaAct: Date.now() },
+        { nombre: "Mantequilla Extra 82%", SKU: "MAN-001", categoria: "Lácteos", stockActual: 15, stockMinimo: 20, unidad: "kg", estado: "bajo", ultimaAct: Date.now() },
+        { nombre: "Sal Fina", SKU: "SAL-001", categoria: "Otros", stockActual: 25, stockMinimo: 10, unidad: "kg", estado: "ok", ultimaAct: Date.now() },
+        { nombre: "Azúcar Blanco", SKU: "AZU-001", categoria: "Otros", stockActual: 40, stockMinimo: 15, unidad: "kg", estado: "ok", ultimaAct: Date.now() },
+        { nombre: "Chips de Chocolate 54%", SKU: "CHO-001", categoria: "Chocolates", stockActual: 8, stockMinimo: 10, unidad: "kg", estado: "bajo", ultimaAct: Date.now() }
+      ];
+
+      const ingRefs = demoIngredientes.map(ing => {
+        const ref = doc(collection(db, "ingredientes"));
+        batch.set(ref, ing);
+        return { id: ref.id, nombre: ing.nombre, unidad: ing.unidad };
+      });
+
+      // 3. Poblar Clientes (3)
+      const demoClientes = [
+        { nombre: "Cafetería Central", tipo: "B2B", email: "pedidos@cafecentral.com", telefono: "600123456", direccion: "Gran Vía 12", ultimaAct: Date.now() },
+        { nombre: "Hotel Miramar*****", tipo: "B2B", email: "cocina@miramar.com", telefono: "611987654", direccion: "Paseo Marítimo 1", ultimaAct: Date.now() },
+        { nombre: "Restaurante El Puerto", tipo: "B2B", email: "info@elpuerto.es", telefono: "622334455", direccion: "Muelle 4", ultimaAct: Date.now() }
+      ];
+      demoClientes.forEach(cli => {
+        const ref = doc(collection(db, "clientes"));
+        batch.set(ref, cli);
+      });
+
+      // 4. Poblar Recetas (3)
+      const demoRecetas = [
+        {
+          nombre: "Barra Rústica", mermasPermitidas: 2, ultimaAct: Date.now(),
+          ingredientes: [
+            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.25, unidad: ingRefs[0].unidad },
+            { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.005, unidad: ingRefs[1].unidad },
+            { ingredienteId: ingRefs[3].id, nombre: ingRefs[3].nombre, cantidad: 0.005, unidad: ingRefs[3].unidad }
+          ]
+        },
+        {
+          nombre: "Croissant de Mantequilla", mermasPermitidas: 5, ultimaAct: Date.now(),
+          ingredientes: [
+            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.05, unidad: ingRefs[0].unidad },
+            { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.002, unidad: ingRefs[1].unidad },
+            { ingredienteId: ingRefs[2].id, nombre: ingRefs[2].nombre, cantidad: 0.025, unidad: ingRefs[2].unidad },
+            { ingredienteId: ingRefs[4].id, nombre: ingRefs[4].nombre, cantidad: 0.005, unidad: ingRefs[4].unidad }
+          ]
+        },
+        {
+          nombre: "Napolitana de Chocolate", mermasPermitidas: 5, ultimaAct: Date.now(),
+          ingredientes: [
+            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.05, unidad: ingRefs[0].unidad },
+            { ingredienteId: ingRefs[2].id, nombre: ingRefs[2].nombre, cantidad: 0.025, unidad: ingRefs[2].unidad },
+            { ingredienteId: ingRefs[5].id, nombre: ingRefs[5].nombre, cantidad: 0.015, unidad: ingRefs[5].unidad }
+          ]
+        }
+      ];
+      demoRecetas.forEach(rec => {
+        const ref = doc(collection(db, "recetas"));
+        batch.set(ref, rec);
+      });
+
+      await batch.commit();
+      alert("✅ Datos Demo generados correctamente.");
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error generando datos demo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return <div className="p-8 text-center text-slate-500">Cargando tablero y métricas...</div>;
   }
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Panel de Control Operativo</h2>
           <p className="text-sm text-slate-500 mt-1">Resumen de la actividad en tiempo real de BakeryOS.</p>
         </div>
+        <button
+          onClick={handleSeedData}
+          className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2"
+          title="Poblar base de datos con información realista"
+        >
+          Generar Datos Demo
+        </button>
       </div>
 
       {/* KPI GRID */}

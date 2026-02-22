@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard,
     Package,
@@ -16,9 +17,31 @@ import {
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const sidebarRef = useRef<HTMLElement>(null);
+    const pathname = usePathname();
+
+    // Close sidebar on outside click if it's open (not collapsed)
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && !isCollapsed) {
+                // Actually, if it's desktop it shouldn't auto close maybe? The user prompt said:
+                // "si la barra lateral está desplegada y el usuario hace clic fuera de ella, se pliegue automáticamente."
+                setIsCollapsed(true);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isCollapsed]);
+
+    // Active state helper
+    const isActive = (path: string) => {
+        if (path === '/') return pathname === '/';
+        return pathname?.startsWith(path);
+    };
 
     return (
-        <aside className={`relative z-50 flex flex-col border-r border-slate-200 bg-white transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+        <aside ref={sidebarRef} className={`relative z-50 flex flex-col border-r border-slate-200 bg-white transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
             {/* Logo Area */}
             <div className={`flex h-16 items-center border-b border-slate-200 ${isCollapsed ? 'justify-center' : 'px-6 justify-between'}`}>
                 {!isCollapsed && (
@@ -54,39 +77,54 @@ export default function Sidebar() {
                             <Link
                                 href="/"
                                 title="Dashboard"
-                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md bg-blue-50 py-2 text-sm font-medium text-blue-700 transition-colors`}
+                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium transition-colors ${isActive('/') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
                                 <LayoutDashboard size={18} className="flex-shrink-0" />
                                 {!isCollapsed && (
                                     <>
                                         <span className="whitespace-nowrap">Dashboard</span>
-                                        <div className="ml-auto w-1 h-5 bg-blue-600 rounded-full" />
+                                        {isActive('/') && <div className="ml-auto w-1 h-5 bg-blue-600 rounded-full" />}
                                     </>
                                 )}
                             </Link>
                             <Link
                                 href="/inventario"
                                 title="Inventario"
-                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors`}
+                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium transition-colors ${isActive('/inventario') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
                                 <Package size={18} className="flex-shrink-0" />
-                                {!isCollapsed && <span className="whitespace-nowrap">Inventario</span>}
+                                {!isCollapsed && (
+                                    <>
+                                        <span className="whitespace-nowrap">Inventario</span>
+                                        {isActive('/inventario') && <div className="ml-auto w-1 h-5 bg-blue-600 rounded-full" />}
+                                    </>
+                                )}
                             </Link>
                             <Link
                                 href="/produccion"
                                 title="Producción"
-                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors`}
+                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium transition-colors ${isActive('/produccion') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
                                 <ChefHat size={18} className="flex-shrink-0" />
-                                {!isCollapsed && <span className="whitespace-nowrap">Producción</span>}
+                                {!isCollapsed && (
+                                    <>
+                                        <span className="whitespace-nowrap">Producción</span>
+                                        {isActive('/produccion') && <div className="ml-auto w-1 h-5 bg-blue-600 rounded-full" />}
+                                    </>
+                                )}
                             </Link>
                             <Link
                                 href="/clientes"
                                 title="Clientes y Pedidos"
-                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors`}
+                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium transition-colors ${isActive('/clientes') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
                                 <Users size={18} className="flex-shrink-0" />
-                                {!isCollapsed && <span className="whitespace-nowrap">Clientes y Pedidos</span>}
+                                {!isCollapsed && (
+                                    <>
+                                        <span className="whitespace-nowrap">Clientes y Pedidos</span>
+                                        {isActive('/clientes') && <div className="ml-auto w-1 h-5 bg-blue-600 rounded-full" />}
+                                    </>
+                                )}
                             </Link>
                         </div>
                     </div>
@@ -100,18 +138,28 @@ export default function Sidebar() {
                             <Link
                                 href="/facturacion"
                                 title="Facturación"
-                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors`}
+                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium transition-colors ${isActive('/facturacion') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
                                 <FileText size={18} className="flex-shrink-0" />
-                                {!isCollapsed && <span className="whitespace-nowrap">Facturación</span>}
+                                {!isCollapsed && (
+                                    <>
+                                        <span className="whitespace-nowrap">Facturación</span>
+                                        {isActive('/facturacion') && <div className="ml-auto w-1 h-5 bg-blue-600 rounded-full" />}
+                                    </>
+                                )}
                             </Link>
                             <Link
                                 href="/configuracion"
                                 title="Configuración"
-                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors`}
+                                className={`flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} rounded-md py-2 text-sm font-medium transition-colors ${isActive('/configuracion') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
                                 <Settings size={18} className="flex-shrink-0" />
-                                {!isCollapsed && <span className="whitespace-nowrap">Configuración</span>}
+                                {!isCollapsed && (
+                                    <>
+                                        <span className="whitespace-nowrap">Configuración</span>
+                                        {isActive('/configuracion') && <div className="ml-auto w-1 h-5 bg-blue-600 rounded-full" />}
+                                    </>
+                                )}
                             </Link>
                         </div>
                     </div>

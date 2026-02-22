@@ -15,10 +15,10 @@ export default function InventarioPage() {
     const [formData, setFormData] = useState({
         nombre: "",
         SKU: "",
-        categoria: "",
+        categoria: "Harinas",
         stockActual: 0,
-        minimo: 0,
-        estado: "ok",
+        stockMinimo: 0, // renamed from minimo
+        estado: "ok" as 'ok' | 'bajo' | 'alerta',
     });
 
     // Fetch data in real-time
@@ -49,18 +49,20 @@ export default function InventarioPage() {
     const handleAddIngredient = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const newIngredient: Omit<Ingredient, 'id'> = {
+            const finalData = {
                 nombre: formData.nombre,
                 SKU: formData.SKU,
                 categoria: formData.categoria,
                 stockActual: Number(formData.stockActual),
-                minimo: Number(formData.minimo),
-                estado: calculateStatus(Number(formData.stockActual), Number(formData.minimo)),
+                stockMinimo: Number(formData.stockMinimo),
+                estado: calculateStatus(Number(formData.stockActual), Number(formData.stockMinimo)),
+                ultimaAct: Date.now()
             };
-            await addDoc(collection(db, "ingredientes"), newIngredient);
+
+            await addDoc(collection(db, "ingredientes"), finalData);
 
             // Reset form and close
-            setFormData({ nombre: "", SKU: "", categoria: "", stockActual: 0, minimo: 0, estado: "ok" });
+            setFormData({ nombre: "", SKU: "", categoria: "Harinas", stockActual: 0, stockMinimo: 0, estado: "ok" });
             setShowForm(false);
         } catch (error) {
             console.error("Error adding ingredient: ", error);
@@ -135,10 +137,8 @@ export default function InventarioPage() {
                             </div>
                             <div className="w-1/2">
                                 <label className="block text-xs font-medium text-slate-600 mb-1">Mínimo</label>
-                                <input
-                                    required type="number" min="0" step="0.01"
-                                    value={formData.minimo} onChange={e => setFormData({ ...formData, minimo: Number(e.target.value) })}
-                                    className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-blue-600 outline-none"
+                                <input type="number" required placeholder="0" className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white"
+                                    value={formData.stockMinimo} onChange={e => setFormData({ ...formData, stockMinimo: Number(e.target.value) })}
                                 />
                             </div>
                         </div>
@@ -193,8 +193,8 @@ export default function InventarioPage() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                         {ing.categoria}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 font-medium">
-                                        {ing.stockActual} <span className="text-slate-400 font-normal">/ {ing.minimo}</span>
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 text-right">
+                                        {ing.stockActual} <span className="text-slate-400 font-normal">/ {ing.stockMinimo}</span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
