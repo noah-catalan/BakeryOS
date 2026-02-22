@@ -85,17 +85,22 @@ export default function ClientesPage() {
     const handleSaveClient = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            // Firestore no acepta valores undefined. Sanitize data.
+            const sanitizedData = Object.fromEntries(
+                Object.entries(clientData).filter(([_, v]) => v !== undefined)
+            );
+
             if (editingClientId) {
-                await updateDoc(doc(db, "clientes", editingClientId), { ...clientData });
+                await updateDoc(doc(db, "clientes", editingClientId), sanitizedData);
             } else {
-                await addDoc(collection(db, "clientes"), { ...clientData, fechaRegistro: Date.now(), userId: user?.uid });
+                await addDoc(collection(db, "clientes"), { ...sanitizedData, fechaRegistro: Date.now(), userId: user?.uid });
             }
             // Reset
             setEditingClientId(null);
             setClientData({ nombre: '', tipo: 'B2B', email: '', telefono: '', direccion: '', fechaRegistro: Date.now() });
             setShowClientForm(false);
         } catch (error) {
-            console.error("Error creating/updating client:", error);
+            console.error("Error completo al guardar el cliente:", error);
             alert("Error al guardar el cliente.");
         }
     };
@@ -184,7 +189,7 @@ export default function ClientesPage() {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Módulo de Clientes y Pedidos</h2>
-                    <p className="text-sm text-slate-500 mt-1">Gestiona tu directorio comercial y registra los pedidos de venta.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Gestiona tu directorio comercial y registra los pedidos de venta.</p>
                 </div>
                 <button
                     onClick={() => activeTab === 'directorio' ? setShowClientForm(!showClientForm) : setShowOrderForm(!showOrderForm)}
@@ -196,7 +201,7 @@ export default function ClientesPage() {
             </div>
 
             {/* Tabs Navigation */}
-            <div className="border-b border-slate-200 mb-6">
+            <div className="border-b border-slate-200 dark:border-slate-800 mb-6">
                 <nav className="-mb-px flex space-x-8">
                     <button
                         onClick={() => setActiveTab('directorio')}
@@ -231,36 +236,36 @@ export default function ClientesPage() {
                     <div className="space-y-6">
                         {/* Client Form */}
                         {showClientForm && (
-                            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 shadow-sm w-full mb-6">
-                                <h3 className="text-lg font-semibold mb-4 text-slate-800">{editingClientId ? 'Editar Cliente' : 'Registrar Cliente'}</h3>
+                            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm w-full mb-6">
+                                <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-50">{editingClientId ? 'Editar Cliente' : 'Registrar Cliente'}</h3>
                                 <form onSubmit={handleSaveClient}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                         <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Nombre / Razón Social</label>
+                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Nombre / Razón Social</label>
                                             <input required type="text" value={clientData.nombre} onChange={e => setClientData({ ...clientData, nombre: e.target.value })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Tipo de Cliente</label>
+                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Tipo de Cliente</label>
                                             <select value={clientData.tipo} onChange={e => setClientData({ ...clientData, tipo: e.target.value as 'B2B' | 'B2C' })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-900">
                                                 <option value="B2B">B2B (Empresa/Restaurante)</option>
                                                 <option value="B2C">B2C (Particular)</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
+                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Email</label>
                                             <input required type="email" value={clientData.email} onChange={e => setClientData({ ...clientData, email: e.target.value })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Teléfono</label>
+                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Teléfono</label>
                                             <input required type="tel" value={clientData.telefono} onChange={e => setClientData({ ...clientData, telefono: e.target.value })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                         </div>
                                         <div className="md:col-span-2">
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Dirección de Entrega</label>
+                                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Dirección de Entrega</label>
                                             <input required type="text" value={clientData.direccion} onChange={e => setClientData({ ...clientData, direccion: e.target.value })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                         </div>
                                     </div>
                                     <div className="flex justify-end gap-3">
-                                        <button type="button" onClick={() => { setShowClientForm(false); setEditingClientId(null); setClientData({ nombre: '', tipo: 'B2B', email: '', telefono: '', direccion: '', fechaRegistro: Date.now() }); }} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md">Cancelar</button>
+                                        <button type="button" onClick={() => { setShowClientForm(false); setEditingClientId(null); setClientData({ nombre: '', tipo: 'B2B', email: '', telefono: '', direccion: '', fechaRegistro: Date.now() }); }} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-800/50 rounded-md">Cancelar</button>
                                         <button type="submit" className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700">{editingClientId ? 'Guardar Cambios' : 'Guardar Cliente'}</button>
                                     </div>
                                 </form>
@@ -269,19 +274,19 @@ export default function ClientesPage() {
 
                         {/* Client List */}
                         {loading ? (
-                            <div className="text-center text-slate-500 py-8">Cargando directorio...</div>
+                            <div className="text-center text-slate-500 dark:text-slate-400 py-8">Cargando directorio...</div>
                         ) : clientes.length === 0 ? (
-                            <div className="text-center text-slate-500 py-8 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 shadow-sm">No hay clientes registrados.</div>
+                            <div className="text-center text-slate-500 dark:text-slate-400 py-8 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">No hay clientes registrados.</div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {clientes.map(cliente => (
-                                    <div key={cliente.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+                                    <div key={cliente.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:shadow-md transition-shadow">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-2">
                                                 {cliente.tipo === 'B2B' ? <Building2 size={20} className="text-blue-600" /> : <User size={20} className="text-emerald-600" />}
                                                 <div>
                                                     <h3 className="font-bold text-slate-900 dark:text-slate-50 leading-tight">{cliente.nombre}</h3>
-                                                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{cliente.tipo}</span>
+                                                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{cliente.tipo}</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -290,13 +295,13 @@ export default function ClientesPage() {
                                             </div>
                                         </div>
                                         <div className="space-y-2 mb-4">
-                                            <div className="flex items-center text-sm text-slate-600">
+                                            <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
                                                 <Phone size={14} className="mr-2 text-slate-400" /> {cliente.telefono}
                                             </div>
-                                            <div className="flex items-center text-sm text-slate-600">
+                                            <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
                                                 <Mail size={14} className="mr-2 text-slate-400" /> {cliente.email}
                                             </div>
-                                            <div className="flex items-start text-sm text-slate-600">
+                                            <div className="flex items-start text-sm text-slate-600 dark:text-slate-300">
                                                 <MapPin size={14} className="mr-2 mt-0.5 text-slate-400 shrink-0" /> <span className="line-clamp-2">{cliente.direccion}</span>
                                             </div>
                                         </div>
@@ -312,11 +317,11 @@ export default function ClientesPage() {
                     <div className="space-y-6">
                         {/* Order Form */}
                         {showOrderForm && (
-                            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 shadow-sm w-full mb-6">
-                                <h3 className="text-lg font-semibold mb-4 text-slate-800">Registrar Nuevo Pedido</h3>
+                            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm w-full mb-6">
+                                <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-50">Registrar Nuevo Pedido</h3>
                                 <form onSubmit={handleSaveOrder}>
                                     <div className="mb-6">
-                                        <label className="block text-xs font-medium text-slate-600 mb-1">Cliente</label>
+                                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Cliente</label>
                                         <select required value={orderData.clienteId} onChange={(e) => {
                                             const c = clientes.find(x => x.id === e.target.value);
                                             setOrderData({ ...orderData, clienteId: c?.id || '', clienteNombre: c?.nombre || '' });
@@ -327,19 +332,19 @@ export default function ClientesPage() {
                                     </div>
 
                                     {/* Items Adder */}
-                                    <div className="bg-slate-50 p-4 rounded-md border border-slate-200 mb-4">
-                                        <h4 className="text-sm font-medium text-slate-700 mb-3">Líneas de Pedido</h4>
+                                    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-md border border-slate-200 dark:border-slate-800 mb-4">
+                                        <h4 className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-3">Líneas de Pedido</h4>
                                         <div className="flex flex-wrap gap-4 items-end">
                                             <div className="flex-1 min-w-[200px]">
-                                                <label className="block text-xs text-slate-500 mb-1">Producto (Ej. Croissant)</label>
+                                                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Producto (Ej. Croissant)</label>
                                                 <input type="text" value={currentItemName} onChange={e => setCurrentItemName(e.target.value)} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                             </div>
                                             <div className="w-24">
-                                                <label className="block text-xs text-slate-500 mb-1">Cant.</label>
+                                                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Cant.</label>
                                                 <input type="number" step="1" min="1" value={currentItemQty} onChange={e => setCurrentItemQty(Number(e.target.value))} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                             </div>
                                             <div className="w-32">
-                                                <label className="block text-xs text-slate-500 mb-1">Precio Unit. (€)</label>
+                                                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Precio Unit. (€)</label>
                                                 <input type="number" min="0" step="1" value={currentItemPrice} onChange={e => setCurrentItemPrice(Number(e.target.value))} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                             </div>
                                             <button type="button" onClick={handleAddItemToOrder} className="bg-slate-800 text-white px-4 py-1.5 rounded-md text-sm font-medium hover:bg-slate-700">Añadir</button>
@@ -347,10 +352,10 @@ export default function ClientesPage() {
 
                                         {/* Current Items Table */}
                                         {orderData.items.length > 0 && (
-                                            <div className="mt-4 border-t border-slate-200 pt-4">
+                                            <div className="mt-4 border-t border-slate-200 dark:border-slate-800 pt-4">
                                                 <table className="min-w-full text-sm">
                                                     <thead>
-                                                        <tr className="text-left text-slate-500">
+                                                        <tr className="text-left text-slate-500 dark:text-slate-400">
                                                             <th className="font-medium pb-2">Producto</th>
                                                             <th className="font-medium pb-2 text-right">Cant.</th>
                                                             <th className="font-medium pb-2 text-right">Precio U.</th>
@@ -361,10 +366,10 @@ export default function ClientesPage() {
                                                     <tbody className="divide-y divide-slate-100">
                                                         {orderData.items.map((item, idx) => (
                                                             <tr key={idx}>
-                                                                <td className="py-2 text-slate-800">{item.producto}</td>
-                                                                <td className="py-2 text-right text-slate-600">{item.cantidad}</td>
-                                                                <td className="py-2 text-right text-slate-600">{item.precioUnitario.toFixed(2)}€</td>
-                                                                <td className="py-2 text-right font-medium text-slate-800">{(item.cantidad * item.precioUnitario).toFixed(2)}€</td>
+                                                                <td className="py-2 text-slate-800 dark:text-slate-50">{item.producto}</td>
+                                                                <td className="py-2 text-right text-slate-600 dark:text-slate-300">{item.cantidad}</td>
+                                                                <td className="py-2 text-right text-slate-600 dark:text-slate-300">{item.precioUnitario.toFixed(2)}€</td>
+                                                                <td className="py-2 text-right font-medium text-slate-800 dark:text-slate-50">{(item.cantidad * item.precioUnitario).toFixed(2)}€</td>
                                                                 <td className="py-2 text-right">
                                                                     <button type="button" onClick={() => handleRemoveItemFromOrder(idx)} className="text-red-400 hover:text-red-600 inline-flex items-center"><Trash2 size={14} /></button>
                                                                 </td>
@@ -373,7 +378,7 @@ export default function ClientesPage() {
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <td colSpan={3} className="pt-4 text-right font-bold text-slate-700">Total Pedido:</td>
+                                                            <td colSpan={3} className="pt-4 text-right font-bold text-slate-700 dark:text-slate-200">Total Pedido:</td>
                                                             <td className="pt-4 text-right font-bold text-blue-600 text-lg">{orderData.total.toFixed(2)}€</td>
                                                             <td></td>
                                                         </tr>
@@ -384,7 +389,7 @@ export default function ClientesPage() {
                                     </div>
 
                                     <div className="flex justify-end gap-3 mt-6">
-                                        <button type="button" onClick={() => setShowOrderForm(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md">Cancelar</button>
+                                        <button type="button" onClick={() => setShowOrderForm(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-800/50 rounded-md">Cancelar</button>
                                         <button type="submit" disabled={orderData.items.length === 0 || !orderData.clienteId} className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">Guardar Pedido</button>
                                     </div>
                                 </form>
@@ -393,19 +398,19 @@ export default function ClientesPage() {
 
                         {/* Orders List */}
                         {loading ? (
-                            <div className="text-center text-slate-500 py-8">Cargando pedidos...</div>
+                            <div className="text-center text-slate-500 dark:text-slate-400 py-8">Cargando pedidos...</div>
                         ) : pedidos.length === 0 ? (
-                            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 p-8 text-center text-slate-500 shadow-sm">
+                            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-500 dark:text-slate-400 shadow-sm">
                                 No hay pedidos de venta registrados.
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {pedidos.map(pedido => (
-                                    <div key={pedido.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-                                        <div className="p-5 border-b border-slate-100 flex justify-between items-start">
+                                    <div key={pedido.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+                                        <div className="p-5 border-b border-slate-100 dark:border-slate-800/50 flex justify-between items-start">
                                             <div>
                                                 <h3 className="font-bold text-slate-900 dark:text-slate-50">{pedido.clienteNombre}</h3>
-                                                <p className="text-xs text-slate-500 mt-0.5">
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                                     {new Date(pedido.fechaCreacion).toLocaleDateString()}
                                                 </p>
                                             </div>
@@ -419,17 +424,17 @@ export default function ClientesPage() {
                                                 {pedido.estado.toUpperCase()}
                                             </span>
                                         </div>
-                                        <div className="p-5 flex-1 bg-slate-50/50">
+                                        <div className="p-5 flex-1 bg-slate-50 dark:bg-slate-800/50/50">
                                             <ul className="space-y-2 mb-4">
                                                 {pedido.items.map((item, idx) => (
-                                                    <li key={idx} className="flex justify-between text-sm text-slate-600">
+                                                    <li key={idx} className="flex justify-between text-sm text-slate-600 dark:text-slate-300">
                                                         <span>{item.cantidad}x {item.producto}</span>
                                                         <span>{(item.cantidad * item.precioUnitario).toFixed(2)}€</span>
                                                     </li>
                                                 ))}
                                             </ul>
                                         </div>
-                                        <div className="p-5 border-t border-slate-100 flex justify-between items-center bg-white dark:bg-slate-900">
+                                        <div className="p-5 border-t border-slate-100 dark:border-slate-800/50 flex justify-between items-center bg-white dark:bg-slate-900">
                                             <div className="font-bold text-slate-900 dark:text-slate-50">
                                                 Total: <span className="text-blue-600">{pedido.total.toFixed(2)}€</span>
                                             </div>

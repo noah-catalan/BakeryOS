@@ -13,7 +13,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
 
     return (
-        <div className="flex h-screen overflow-hidden bg-slate-50 relative">
+        <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 relative">
             <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
             <div className="flex flex-1 flex-col overflow-hidden w-full">
                 <Topbar toggleMobile={() => setIsMobileOpen(!isMobileOpen)} />

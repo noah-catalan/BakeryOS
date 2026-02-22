@@ -197,40 +197,40 @@ export default function FacturacionPage() {
             {/* Printable Invoice Container */}
             {invoiceToPrint && (
                 <div className="hidden print:block fixed inset-0 z-[100] bg-white dark:bg-slate-900 text-black p-12">
-                    <div className="flex justify-between items-start mb-12 border-b-2 border-slate-200 pb-8">
+                    <div className="flex justify-between items-start mb-12 border-b-2 border-slate-200 dark:border-slate-800 pb-8">
                         <div>
                             <h1 className="text-4xl font-extrabold text-slate-900 dark:text-slate-50 tracking-tight">FACTURA</h1>
-                            <p className="text-lg text-slate-500 mt-2 font-medium">{invoiceToPrint.numeroFactura}</p>
+                            <p className="text-lg text-slate-500 dark:text-slate-400 mt-2 font-medium">{invoiceToPrint.numeroFactura}</p>
                         </div>
                         <div className="text-right">
-                            <p className="font-bold text-slate-800 text-lg">{settings?.business?.razonSocial || "Tu Panadería"}</p>
-                            <p className="text-slate-500">{settings?.business?.cif || "CIF: 00000000"}</p>
-                            <p className="text-slate-500">{settings?.business?.direccion || "Dirección del local"}</p>
-                            <p className="text-slate-500">{settings?.business?.telefono || "Teléfono"}</p>
-                            <p className="text-slate-500 mt-2">Fecha: {new Date(invoiceToPrint.fechaEmision).toLocaleDateString()}</p>
+                            <p className="font-bold text-slate-800 dark:text-slate-50 text-lg">{settings?.business?.razonSocial || "Tu Panadería"}</p>
+                            <p className="text-slate-500 dark:text-slate-400">{settings?.business?.cif || "CIF: 00000000"}</p>
+                            <p className="text-slate-500 dark:text-slate-400">{settings?.business?.direccion || "Dirección del local"}</p>
+                            <p className="text-slate-500 dark:text-slate-400">{settings?.business?.telefono || "Teléfono"}</p>
+                            <p className="text-slate-500 dark:text-slate-400 mt-2">Fecha: {new Date(invoiceToPrint.fechaEmision).toLocaleDateString()}</p>
                         </div>
                     </div>
 
                     <div className="mb-12">
-                        <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Facturado a:</p>
+                        <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Facturado a:</p>
                         <p className="text-xl font-bold text-slate-900 dark:text-slate-50">{invoiceToPrint.clienteNombre}</p>
                     </div>
 
                     <table className="w-full text-left mb-12">
                         <thead>
                             <tr className="border-b-2 border-slate-900">
-                                <th className="py-3 text-slate-800 font-bold">Concepto</th>
-                                <th className="py-3 text-right text-slate-800 font-bold">Cant.</th>
-                                <th className="py-3 text-right text-slate-800 font-bold">Precio U.</th>
-                                <th className="py-3 text-right text-slate-800 font-bold">Subtotal</th>
+                                <th className="py-3 text-slate-800 dark:text-slate-50 font-bold">Concepto</th>
+                                <th className="py-3 text-right text-slate-800 dark:text-slate-50 font-bold">Cant.</th>
+                                <th className="py-3 text-right text-slate-800 dark:text-slate-50 font-bold">Precio U.</th>
+                                <th className="py-3 text-right text-slate-800 dark:text-slate-50 font-bold">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             {invoiceToPrint.items.map((item, idx) => (
-                                <tr key={idx} className="border-b border-slate-200">
-                                    <td className="py-4 text-slate-800 font-medium">{item.producto}</td>
-                                    <td className="py-4 text-right text-slate-600">{item.cantidad}</td>
-                                    <td className="py-4 text-right text-slate-600">{item.precioUnitario.toFixed(2)}€</td>
+                                <tr key={idx} className="border-b border-slate-200 dark:border-slate-800">
+                                    <td className="py-4 text-slate-800 dark:text-slate-50 font-medium">{item.producto}</td>
+                                    <td className="py-4 text-right text-slate-600 dark:text-slate-300">{item.cantidad}</td>
+                                    <td className="py-4 text-right text-slate-600 dark:text-slate-300">{item.precioUnitario.toFixed(2)}€</td>
                                     <td className="py-4 text-right text-slate-900 dark:text-slate-50 font-medium">{(item.cantidad * item.precioUnitario).toFixed(2)}€</td>
                                 </tr>
                             ))}
@@ -239,11 +239,11 @@ export default function FacturacionPage() {
 
                     <div className="flex justify-end">
                         <div className="w-64 space-y-3">
-                            <div className="flex justify-between text-slate-600">
+                            <div className="flex justify-between text-slate-600 dark:text-slate-300">
                                 <span>Base Imponible:</span>
                                 <span>{invoiceToPrint.subtotal.toFixed(2)}€</span>
                             </div>
-                            <div className="flex justify-between text-slate-600">
+                            <div className="flex justify-between text-slate-600 dark:text-slate-300">
                                 <span>IVA ({invoiceToPrint.impuestosPorcentaje}%):</span>
                                 <span>{(invoiceToPrint.subtotal * (invoiceToPrint.impuestosPorcentaje / 100)).toFixed(2)}€</span>
                             </div>
@@ -260,7 +260,7 @@ export default function FacturacionPage() {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Módulo de Facturación</h2>
-                        <p className="text-sm text-slate-500 mt-1">Emite facturas y controla el estado de los cobros.</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Emite facturas y controla el estado de los cobros.</p>
                     </div>
                     <button
                         onClick={() => setActiveTab('nueva')}
@@ -272,7 +272,7 @@ export default function FacturacionPage() {
                 </div>
 
                 {/* Tabs */}
-                <div className="border-b border-slate-200 mb-6">
+                <div className="border-b border-slate-200 dark:border-slate-800 mb-6">
                     <nav className="-mb-px flex space-x-8">
                         <button
                             onClick={() => setActiveTab('historial')}
@@ -306,29 +306,29 @@ export default function FacturacionPage() {
                     {activeTab === 'historial' && (
                         <div className="space-y-6">
                             {loading ? (
-                                <div className="text-center text-slate-500 py-8">Cargando facturas...</div>
+                                <div className="text-center text-slate-500 dark:text-slate-400 py-8">Cargando facturas...</div>
                             ) : facturas.length === 0 ? (
-                                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 p-8 text-center text-slate-500 shadow-sm">
+                                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-500 dark:text-slate-400 shadow-sm">
                                     No hay facturas emitidas ni en borrador.
                                 </div>
                             ) : (
-                                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
+                                <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
                                     <table className="min-w-full divide-y divide-slate-200">
-                                        <thead className="bg-slate-50">
+                                        <thead className="bg-slate-50 dark:bg-slate-800/50">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Número</th>
-                                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Cliente</th>
-                                                <th className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Importe</th>
-                                                <th className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</th>
-                                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Emisión</th>
-                                                <th className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Acciones</th>
+                                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Número</th>
+                                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Cliente</th>
+                                                <th className="px-6 py-3 text-right text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Importe</th>
+                                                <th className="px-6 py-3 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Estado</th>
+                                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Emisión</th>
+                                                <th className="px-6 py-3 text-right text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-200">
                                             {facturas.map(fac => (
-                                                <tr key={fac.id} className="hover:bg-slate-50">
+                                                <tr key={fac.id} className="hover:bg-slate-50 dark:bg-slate-800/50">
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900 dark:text-slate-50">{fac.numeroFactura}</td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{fac.clienteNombre}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{fac.clienteNombre}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600 text-right">{fac.total.toFixed(2)}€</td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-center">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
@@ -340,7 +340,7 @@ export default function FacturacionPage() {
                                                             {fac.estado.toUpperCase()}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
                                                         {new Date(fac.fechaEmision).toLocaleDateString()}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
@@ -349,7 +349,7 @@ export default function FacturacionPage() {
                                                                 <CheckCircle size={18} />
                                                             </button>
                                                         )}
-                                                        <button onClick={() => handlePrintInvoice(fac)} className="text-slate-400 hover:text-slate-600 p-1" title="Imprimir o PDF">
+                                                        <button onClick={() => handlePrintInvoice(fac)} className="text-slate-400 hover:text-slate-600 dark:text-slate-300 p-1" title="Imprimir o PDF">
                                                             <Printer size={18} />
                                                         </button>
                                                         <button onClick={() => fac.id && handleDeleteInvoice(fac.id)} className="text-red-400 hover:text-red-600 p-1" title="Eliminar">
@@ -367,9 +367,9 @@ export default function FacturacionPage() {
 
                     {/* EMISOR TAB */}
                     {activeTab === 'nueva' && (
-                        <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 shadow-sm w-full max-w-4xl opacity-100 transition-opacity p-8">
-                            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
-                                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm w-full max-w-4xl opacity-100 transition-opacity p-8">
+                            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/50">
+                                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-50 flex items-center gap-2">
                                     <FileText className="text-blue-600" />
                                     Nueva Factura
                                 </h3>
@@ -378,8 +378,8 @@ export default function FacturacionPage() {
 
                             {/* Top Controls: Client & Linked Order */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                                    <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide">Facturar a</label>
+                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-100 dark:border-slate-800/50">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-2 uppercase tracking-wide">Facturar a</label>
                                     <select required value={invoiceData.clienteId} onChange={(e) => {
                                         const c = clientes.find(x => x.id === e.target.value);
                                         setInvoiceData({ ...invoiceData, clienteId: c?.id || '', clienteNombre: c?.nombre || '' });
@@ -389,8 +389,8 @@ export default function FacturacionPage() {
                                     </select>
                                 </div>
 
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                                    <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center justify-between">
+                                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-100 dark:border-slate-800/50">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-2 uppercase tracking-wide flex items-center justify-between">
                                         <span>Importar desde Pedido</span>
                                         <span className="text-amber-600 text-[10px] flex items-center gap-1"><AlertCircle size={10} /> Opcional</span>
                                     </label>
@@ -404,12 +404,12 @@ export default function FacturacionPage() {
 
                             {/* Items Manager */}
                             <div className="mb-8">
-                                <h4 className="text-sm font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2">Líneas de Factura</h4>
+                                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-50 mb-3 border-b border-slate-100 dark:border-slate-800/50 pb-2">Líneas de Factura</h4>
 
                                 {/* Items Table */}
                                 <table className="min-w-full text-sm mb-4">
                                     <thead>
-                                        <tr className="text-left text-slate-500 border-b border-slate-200">
+                                        <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                                             <th className="font-medium pb-2 px-2">Concepto</th>
                                             <th className="font-medium pb-2 px-2 text-right w-24">Cant.</th>
                                             <th className="font-medium pb-2 px-2 text-right w-32">Precio U.</th>
@@ -419,10 +419,10 @@ export default function FacturacionPage() {
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {invoiceData.items.map((item, idx) => (
-                                            <tr key={idx} className="hover:bg-slate-50">
-                                                <td className="py-3 px-2 text-slate-800 font-medium">{item.producto}</td>
-                                                <td className="py-3 px-2 text-right text-slate-600">{item.cantidad}</td>
-                                                <td className="py-3 px-2 text-right text-slate-600">{item.precioUnitario.toFixed(2)}€</td>
+                                            <tr key={idx} className="hover:bg-slate-50 dark:bg-slate-800/50">
+                                                <td className="py-3 px-2 text-slate-800 dark:text-slate-50 font-medium">{item.producto}</td>
+                                                <td className="py-3 px-2 text-right text-slate-600 dark:text-slate-300">{item.cantidad}</td>
+                                                <td className="py-3 px-2 text-right text-slate-600 dark:text-slate-300">{item.precioUnitario.toFixed(2)}€</td>
                                                 <td className="py-3 px-2 text-right font-medium text-slate-900 dark:text-slate-50">{(item.cantidad * item.precioUnitario).toFixed(2)}€</td>
                                                 <td className="py-3 px-2 text-right">
                                                     <button type="button" onClick={() => handleRemoveItem(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
@@ -453,16 +453,16 @@ export default function FacturacionPage() {
                             </div>
 
                             {/* Totals & Tax Footer */}
-                            <div className="flex justify-end pt-6 border-t border-slate-200">
+                            <div className="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-800">
                                 <div className="w-full max-w-sm space-y-3">
-                                    <div className="flex justify-between items-center text-sm text-slate-600">
+                                    <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-300">
                                         <span>Base Imponible:</span>
                                         <span className="font-medium">{invoiceData.subtotal.toFixed(2)}€</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm text-slate-600">
+                                    <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-300">
                                         <span className="flex items-center gap-2">
                                             Impuestos (IVA):
-                                            <select value={invoiceData.impuestosPorcentaje} onChange={handleTaxChange} className="rounded border-slate-300 py-0.5 px-1 text-xs bg-slate-50">
+                                            <select value={invoiceData.impuestosPorcentaje} onChange={handleTaxChange} className="rounded border-slate-300 dark:border-slate-700 py-0.5 px-1 text-xs bg-slate-50 dark:bg-slate-800/50">
                                                 <option value={21}>21% (General)</option>
                                                 <option value={10}>10% (Reducido)</option>
                                                 <option value={4}>4% (Superreducido)</option>
@@ -471,7 +471,7 @@ export default function FacturacionPage() {
                                         </span>
                                         <span className="font-medium">{(invoiceData.subtotal * (invoiceData.impuestosPorcentaje / 100)).toFixed(2)}€</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-lg font-bold text-slate-900 dark:text-slate-50 pt-3 border-t border-slate-200">
+                                    <div className="flex justify-between items-center text-lg font-bold text-slate-900 dark:text-slate-50 pt-3 border-t border-slate-200 dark:border-slate-800">
                                         <span>Total a Pagar:</span>
                                         <span className="text-blue-700">{invoiceData.total.toFixed(2)}€</span>
                                     </div>
@@ -481,7 +481,7 @@ export default function FacturacionPage() {
                             {/* Actions */}
                             <div className="flex justify-end gap-3 mt-10">
                                 <button type="button" onClick={(e) => handleSaveInvoice(e, false)} disabled={invoiceData.items.length === 0 || !invoiceData.clienteId}
-                                    className="px-5 py-2.5 text-sm font-medium border border-slate-300 text-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 rounded-lg disabled:opacity-50">
+                                    className="px-5 py-2.5 text-sm font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:bg-slate-800/50 rounded-lg disabled:opacity-50">
                                     Guardar como Borrador
                                 </button>
                                 <button type="button" onClick={(e) => handleSaveInvoice(e, true)} disabled={invoiceData.items.length === 0 || !invoiceData.clienteId}

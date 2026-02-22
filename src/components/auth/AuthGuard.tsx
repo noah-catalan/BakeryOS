@@ -25,10 +25,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     // Show a loading state while checking authentication
     if (loading) {
         return (
-            <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+            <div className="flex h-screen w-full items-center justify-center bg-slate-50 dark:bg-slate-800/50">
                 <div className="flex flex-col items-center gap-4">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-                    <p className="text-sm font-medium text-slate-500">Verificando sesión...</p>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Verificando sesión...</p>
                 </div>
             </div>
         );

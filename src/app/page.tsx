@@ -217,7 +217,7 @@ export default function Home() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-500">Cargando tablero y métricas...</div>;
+    return <div className="p-8 text-center text-slate-500 dark:text-slate-400">Cargando tablero y métricas...</div>;
   }
 
   return (
@@ -225,11 +225,11 @@ export default function Home() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Panel de Control Operativo</h2>
-          <p className="text-sm text-slate-500 mt-1">Resumen de la actividad en tiempo real de BakeryOS.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Resumen de la actividad en tiempo real de BakeryOS.</p>
         </div>
         <button
           onClick={handleSeedData}
-          className="text-xs font-semibold text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 hover:bg-slate-50 hover:text-slate-700 px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2"
+          className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:bg-slate-800/50 hover:text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2"
           title="Poblar base de datos con información realista"
         >
           Generar Datos Demo
@@ -238,42 +238,42 @@ export default function Home() {
 
       {/* KPI GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
           <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
             <TrendingUp size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">Ingresos (Mes)</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Ingresos (Mes)</p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{ingresosMes.toFixed(2)}€</h3>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
             <ShoppingCart size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">Pedidos Pendientes</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Pedidos Pendientes</p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{pedidosPendientes}</h3>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
           <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
             <ChefHat size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">Producción en Curso</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Producción en Curso</p>
             <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{ordenesEnProceso}</h3>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow" title={alertasStock.length > 0 ? "Requiere atención prioritaria" : "Inventario saludable"}>
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow" title={alertasStock.length > 0 ? "Requiere atención prioritaria" : "Inventario saludable"}>
           <div className={`p-3 rounded-lg ${alertasStock.length > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-50 text-slate-400'}`}>
             {alertasStock.length > 0 ? <AlertTriangle size={24} /> : <CheckCircle size={24} />}
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-500 mb-1">Alertas Stock</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Alertas Stock</p>
             <h3 className={`text-2xl font-bold ${alertasStock.length > 0 ? 'text-red-600' : 'text-slate-900'}`}>{alertasStock.length}</h3>
           </div>
         </div>
@@ -284,9 +284,9 @@ export default function Home() {
         {/* CHART & RECENT ORDERS */}
         <div className="lg:col-span-2 space-y-8">
           {/* Main Chart */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-slate-800">Facturación (Últimos 7 días)</h3>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-50">Facturación (Últimos 7 días)</h3>
             </div>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -308,9 +308,9 @@ export default function Home() {
           </div>
 
           {/* Últimos Pedidos */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50/50">
+              <h3 className="font-bold text-slate-800 dark:text-slate-50 flex items-center gap-2">
                 <Clock className="text-blue-600" size={18} />
                 Últimos Pedidos de Venta
               </h3>
@@ -320,19 +320,19 @@ export default function Home() {
             </div>
             <div className="flex-1 p-0 overflow-x-auto">
               {ultimosPedidos.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 text-sm">No hay pedidos recientes en la base de datos.</div>
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">No hay pedidos recientes en la base de datos.</div>
               ) : (
                 <table className="min-w-full divide-y divide-slate-100">
                   <tbody className="divide-y divide-slate-100">
                     {ultimosPedidos.map((pedido) => (
-                      <tr key={pedido.id} className="hover:bg-slate-50 transition-colors">
+                      <tr key={pedido.id} className="hover:bg-slate-50 dark:bg-slate-800/50 transition-colors">
                         <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-900 dark:text-slate-50 w-1/3">
                           {pedido.clienteNombre}
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-slate-500">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
                           {new Date(pedido.fechaCreacion).toLocaleDateString()}
                         </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 text-right">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-slate-50 text-right">
                           {pedido.total.toFixed(2)}€
                         </td>
                         <td className="px-5 py-4 whitespace-nowrap text-right">
@@ -354,7 +354,7 @@ export default function Home() {
         </div>
 
         {/* ALERTAS DE STOCK CRÍTICO */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-fit">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-fit">
           <div className="p-5 border-b border-red-50 flex items-center justify-between bg-red-50/30">
             <h3 className="font-bold text-red-700 flex items-center gap-2">
               <AlertTriangle size={18} />
@@ -364,27 +364,27 @@ export default function Home() {
           </div>
           <div className="flex-1 p-0">
             {alertasStock.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 text-sm flex flex-col items-center gap-2">
+              <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm flex flex-col items-center gap-2">
                 <CheckCircle className="text-emerald-500 mb-1" size={24} />
                 Inventario saludable.<br />Sin alertas de compra hoy.
               </div>
             ) : (
               <ul className="divide-y divide-slate-100">
                 {alertasStock.slice(0, 8).map((ing) => (
-                  <li key={ing.id} className="p-4 hover:bg-slate-50 flex flex-col transition-colors border-l-4 border-red-400">
+                  <li key={ing.id} className="p-4 hover:bg-slate-50 dark:bg-slate-800/50 flex flex-col transition-colors border-l-4 border-red-400">
                     <div className="flex justify-between items-start">
-                      <p className="font-bold text-slate-800 text-sm">{ing.nombre}</p>
+                      <p className="font-bold text-slate-800 dark:text-slate-50 text-sm">{ing.nombre}</p>
                       <p className="font-bold text-red-600">{ing.stockActual} <span className="text-xs font-normal">{ing.unidad}</span></p>
                     </div>
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Min: {ing.stockMinimo} {ing.unidad}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 px-2 py-0.5 rounded">Min: {ing.stockMinimo} {ing.unidad}</span>
                       <span className="text-xs font-medium text-red-500 uppercase tracking-tighter">Bajo Mínimos</span>
                     </div>
                   </li>
                 ))}
                 {alertasStock.length > 8 && (
-                  <li className="p-3 text-center bg-slate-50 border-t border-slate-100">
-                    <Link href="/inventario" className="text-xs font-bold text-slate-500 hover:text-red-600">
+                  <li className="p-3 text-center bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800/50">
+                    <Link href="/inventario" className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-red-600">
                       + {alertasStock.length - 8} ingredientes más en alerta
                     </Link>
                   </li>

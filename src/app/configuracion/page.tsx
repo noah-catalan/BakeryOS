@@ -91,7 +91,7 @@ export default function ConfiguracionPage() {
     if (loading) {
         return (
             <div className="p-8 max-w-4xl mx-auto flex justify-center items-center min-h-[400px]">
-                <div className="text-slate-500">Cargando configuración...</div>
+                <div className="text-slate-500 dark:text-slate-400">Cargando configuración...</div>
             </div>
         );
     }
@@ -100,12 +100,12 @@ export default function ConfiguracionPage() {
         <div className="p-8 max-w-4xl mx-auto">
             <div className="mb-8">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Configuración del Sistema</h2>
-                <p className="text-sm text-slate-500 mt-1">Ajusta los parámetros globales de la panadería y tus preferencias de usuario.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Ajusta los parámetros globales de la panadería y tus preferencias de usuario.</p>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
                 {/* Sidebar Setup Menu */}
-                <div className="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-6 flex flex-col flex-shrink-0">
+                <div className="w-full md:w-64 bg-slate-50 dark:bg-slate-800/50 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col flex-shrink-0">
                     <nav className="space-y-2">
                         <button
                             onClick={() => setActiveTab('negocio')}
@@ -121,7 +121,7 @@ export default function ConfiguracionPage() {
                             <User size={18} />
                             Perfil y Preferencias
                         </button>
-                        <hr className="my-4 border-slate-200" />
+                        <hr className="my-4 border-slate-200 dark:border-slate-800" />
                         <button disabled className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 opacity-60 cursor-not-allowed">
                             <Shield size={18} />
                             Seguridad e Integraciones
@@ -141,47 +141,47 @@ export default function ConfiguracionPage() {
                         {activeTab === 'negocio' && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4">Información Fiscal Corporativa</h3>
+                                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50 border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">Información Fiscal Corporativa</h3>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la Panadería</label>
-                                        <input type="text" value={businessData.razonSocial} onChange={e => setBusinessData({ ...businessData, razonSocial: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Panadería Europea S.L." />
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Nombre de la Panadería</label>
+                                        <input type="text" value={businessData.razonSocial} onChange={e => setBusinessData({ ...businessData, razonSocial: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Panadería Europea S.L." />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">CIF / NIF</label>
-                                        <input type="text" value={businessData.cif} onChange={e => setBusinessData({ ...businessData, cif: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="B12345678" />
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">CIF / NIF</label>
+                                        <input type="text" value={businessData.cif} onChange={e => setBusinessData({ ...businessData, cif: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="B12345678" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Email de Contacto</label>
-                                        <input type="email" value={businessData.emailContacto} onChange={e => setBusinessData({ ...businessData, emailContacto: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="hola@panaderia.com" />
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Email de Contacto</label>
+                                        <input type="email" value={businessData.emailContacto} onChange={e => setBusinessData({ ...businessData, emailContacto: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="hola@panaderia.com" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
-                                        <input type="text" value={businessData.telefono} onChange={e => setBusinessData({ ...businessData, telefono: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="+34 600 000 000" />
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Teléfono</label>
+                                        <input type="text" value={businessData.telefono} onChange={e => setBusinessData({ ...businessData, telefono: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="+34 600 000 000" />
                                     </div>
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Dirección Principal</label>
-                                        <input type="text" value={businessData.direccion} onChange={e => setBusinessData({ ...businessData, direccion: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Calle de la Harina 123, Madrid" />
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Dirección Principal</label>
+                                        <input type="text" value={businessData.direccion} onChange={e => setBusinessData({ ...businessData, direccion: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Calle de la Harina 123, Madrid" />
                                     </div>
                                 </div>
 
                                 <div className="mt-8">
-                                    <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4">Ajustes Financieros</h3>
+                                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50 border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">Ajustes Financieros</h3>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Moneda Base</label>
-                                        <select value={businessData.monedaBase} onChange={e => setBusinessData({ ...businessData, monedaBase: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white dark:bg-slate-900">
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Moneda Base</label>
+                                        <select value={businessData.monedaBase} onChange={e => setBusinessData({ ...businessData, monedaBase: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white dark:bg-slate-900">
                                             <option value="EUR">Euro (€)</option>
                                             <option value="USD">Dólar ($)</option>
                                             <option value="GBP">Libra (£)</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">IVA por defecto (%) para nuevos clientes</label>
-                                        <input type="number" step="1" min="0" max="100" value={businessData.ivaPorDefecto} onChange={e => setBusinessData({ ...businessData, ivaPorDefecto: Number(e.target.value) })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" />
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">IVA por defecto (%) para nuevos clientes</label>
+                                        <input type="number" step="1" min="0" max="100" value={businessData.ivaPorDefecto} onChange={e => setBusinessData({ ...businessData, ivaPorDefecto: Number(e.target.value) })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" />
                                     </div>
                                 </div>
                             </div>
@@ -190,29 +190,29 @@ export default function ConfiguracionPage() {
                         {activeTab === 'perfil' && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4">Perfil Operativo</h3>
+                                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50 border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">Perfil Operativo</h3>
                                 </div>
 
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Mostrado</label>
-                                            <input type="text" value={userData.nombre} onChange={e => setUserData({ ...userData, nombre: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Ej: Juan Pérez" />
+                                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Nombre Mostrado</label>
+                                            <input type="text" value={userData.nombre} onChange={e => setUserData({ ...userData, nombre: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Ej: Juan Pérez" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-1">Foto de Perfil (URL pública)</label>
-                                            <input type="text" value={userData.avatarUrl || ''} onChange={e => setUserData({ ...userData, avatarUrl: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="https://..." />
+                                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Foto de Perfil (URL pública)</label>
+                                            <input type="text" value={userData.avatarUrl || ''} onChange={e => setUserData({ ...userData, avatarUrl: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="https://..." />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="mt-8">
-                                    <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2 mb-4">Preferencias de Sistema</h3>
+                                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50 border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">Preferencias de Sistema</h3>
                                 </div>
                                 <div className="space-y-4 pb-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Tema Visual</label>
-                                        <select value={userData.temaVisual} onChange={e => setUserData({ ...userData, temaVisual: e.target.value as any })} className="mt-1 block w-full max-w-xs rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white dark:bg-slate-900">
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Tema Visual</label>
+                                        <select value={userData.temaVisual} onChange={e => setUserData({ ...userData, temaVisual: e.target.value as any })} className="mt-1 block w-full max-w-xs rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white dark:bg-slate-900">
                                             <option value="light">Claro (Recomendado)</option>
                                             <option value="dark">Oscuro</option>
                                             <option value="system">Sincronizar con el Sistema</option>
@@ -222,20 +222,20 @@ export default function ConfiguracionPage() {
                                     <div className="pt-4 space-y-3">
                                         <div className="flex items-start">
                                             <div className="flex h-5 items-center">
-                                                <input id="email_notif" type="checkbox" checked={userData.notificacionesEmail} onChange={e => setUserData({ ...userData, notificacionesEmail: e.target.checked })} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                                                <input id="email_notif" type="checkbox" checked={userData.notificacionesEmail} onChange={e => setUserData({ ...userData, notificacionesEmail: e.target.checked })} className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500" />
                                             </div>
                                             <div className="ml-3 text-sm">
-                                                <label htmlFor="email_notif" className="font-medium text-slate-700">Notificaciones por Email</label>
-                                                <p className="text-slate-500">Recibir resúmenes de turno y alertas de stock crítico en el correo principal.</p>
+                                                <label htmlFor="email_notif" className="font-medium text-slate-700 dark:text-slate-200">Notificaciones por Email</label>
+                                                <p className="text-slate-500 dark:text-slate-400">Recibir resúmenes de turno y alertas de stock crítico en el correo principal.</p>
                                             </div>
                                         </div>
                                         <div className="flex items-start">
                                             <div className="flex h-5 items-center">
-                                                <input id="push_notif" type="checkbox" checked={userData.notificacionesPush} onChange={e => setUserData({ ...userData, notificacionesPush: e.target.checked })} className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                                                <input id="push_notif" type="checkbox" checked={userData.notificacionesPush} onChange={e => setUserData({ ...userData, notificacionesPush: e.target.checked })} className="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500" />
                                             </div>
                                             <div className="ml-3 text-sm">
-                                                <label htmlFor="push_notif" className="font-medium text-slate-700">Notificaciones Push</label>
-                                                <p className="text-slate-500">Alertas instantáneas en este navegador web cuando haya actualizaciones críticas.</p>
+                                                <label htmlFor="push_notif" className="font-medium text-slate-700 dark:text-slate-200">Notificaciones Push</label>
+                                                <p className="text-slate-500 dark:text-slate-400">Alertas instantáneas en este navegador web cuando haya actualizaciones críticas.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +243,7 @@ export default function ConfiguracionPage() {
                             </div>
                         )}
 
-                        <div className="mt-8 pt-6 border-t border-slate-200 flex justify-end">
+                        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-end">
                             <button
                                 type="submit"
                                 disabled={saving}
