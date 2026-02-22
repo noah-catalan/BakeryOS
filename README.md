@@ -2,6 +2,13 @@
 
 BakeryOS es un sistema ERP (Enterprise Resource Planning) moderno y potente diseñado específicamente para la gestión integral de panaderías y pastelerías. Permite a los administradores llevar un control en tiempo real del inventario, la producción, los pedidos y la facturación desde una única plataforma centralizada.
 
+## 🚀 Live Demo
+[https://bakery-os-ten.vercel.app/](https://bakery-os-ten.vercel.app/)
+
+🔑 **Credenciales de prueba:**
+- **Email:** `admin@bakeryos.com`
+- **Contraseña:** `admin123`
+
 ## 🚀 Características Principales (Sprint 1)
 - **Autenticación Segura:** Sistema de login mediante Firebase Authentication.
 - **Dashboard Interactivo:** Panel de control con métricas clave y gráficos en tiempo real usando Recharts.
