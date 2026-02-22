@@ -1,28 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { BookOpen, CalendarClock, Plus, List, Scale, Clock, Trash2, CheckCircle, Play } from "lucide-react";
-import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, writeBatch } from "firebase/firestore";
+import { useState } from "react";
+import { BookOpen, CalendarClock, Plus, List, Scale, Clock, Trash2, CheckCircle, Play, Euro } from "lucide-react";
+import { addDoc, collection, deleteDoc, doc, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Recipe, RecipeIngredient, ProductionOrder } from "@/types/production";
-import { Ingredient } from "@/types/inventory";
+import { useRecipes, useProductionOrders, useIngredients } from "@/hooks/useFirebaseData";
 
 export default function ProduccionPage() {
     const [activeTab, setActiveTab] = useState<'recetas' | 'ordenes'>('recetas');
 
-    // Data State
-    const [recetas, setRecetas] = useState<Recipe[]>([]);
-    const [ordenes, setOrdenes] = useState<ProductionOrder[]>([]);
-    const [ingredientesDb, setIngredientesDb] = useState<Ingredient[]>([]);
-    const [loading, setLoading] = useState(true);
+    // Hooks
+    const { recetas, loading: loadingRecetas } = useRecipes();
+    const { ordenes, loading: loadingOrdenes } = useProductionOrders();
+    const { ingredientes: ingredientesDb, loading: loadingIngredientes } = useIngredients();
+
+    const loading = loadingRecetas || loadingOrdenes || loadingIngredientes;
 
     // Form State for Recipes
     const [showRecipeForm, setShowRecipeForm] = useState(false);
     const [recipeData, setRecipeData] = useState<Omit<Recipe, 'id'>>({
         nombre: '',
-        ingredientes: [],
+        ingredientes_necesarios: [],
         rendimiento: 1,
-        tiempoEstimado: 60
+        tiempoEstimado: 60,
+        costeProduccion: 0
     });
     // Temporary state for adding an ingredient to the recipe
     const [currentIngId, setCurrentIngId] = useState("");
@@ -37,45 +39,6 @@ export default function ProduccionPage() {
         estado: 'pendiente',
         fechaCreacion: Date.now()
     });
-
-    // Fetch data in real-time
-    useEffect(() => {
-        // Fetch Recipes
-        const unsubscribeRecetas = onSnapshot(collection(db, "recetas"), (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            })) as Recipe[];
-            setRecetas(data);
-        });
-
-        // Fetch Orders
-        const unsubscribeOrdenes = onSnapshot(collection(db, "ordenesProduccion"), (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            })) as ProductionOrder[];
-            // Sort to show newest first
-            data.sort((a, b) => b.fechaCreacion - a.fechaCreacion);
-            setOrdenes(data);
-        });
-
-        // Fetch Ingredients for dropdown and deductions
-        const unsubscribeIngredientes = onSnapshot(collection(db, "ingredientes"), (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            })) as Ingredient[];
-            setIngredientesDb(data);
-            setLoading(false);
-        });
-
-        return () => {
-            unsubscribeRecetas();
-            unsubscribeOrdenes();
-            unsubscribeIngredientes();
-        }
-    }, []);
 
     const handleAddIngredientToRecipe = () => {
         if (!currentIngId || currentIngQty <= 0) return;
@@ -92,7 +55,7 @@ export default function ProduccionPage() {
 
         setRecipeData({
             ...recipeData,
-            ingredientes: [...recipeData.ingredientes, newIngDetail]
+            ingredientes_necesarios: [...recipeData.ingredientes_necesarios, newIngDetail]
         });
 
         // Reset inputs
@@ -101,16 +64,16 @@ export default function ProduccionPage() {
     };
 
     const handleRemoveIngredientFromRecipe = (index: number) => {
-        const newIngs = [...recipeData.ingredientes];
+        const newIngs = [...recipeData.ingredientes_necesarios];
         newIngs.splice(index, 1);
-        setRecipeData({ ...recipeData, ingredientes: newIngs });
+        setRecipeData({ ...recipeData, ingredientes_necesarios: newIngs });
     };
 
     const handleSaveRecipe = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             await addDoc(collection(db, "recetas"), recipeData);
-            setRecipeData({ nombre: '', ingredientes: [], rendimiento: 1, tiempoEstimado: 60 });
+            setRecipeData({ nombre: '', ingredientes_necesarios: [], rendimiento: 1, tiempoEstimado: 60, costeProduccion: 0 });
             setShowRecipeForm(false);
         } catch (error) {
             console.error("Error creating recipe:", error);
@@ -166,7 +129,7 @@ export default function ProduccionPage() {
             // 2. Prepare Batch update for Inventory
             const batch = writeBatch(db);
 
-            for (const ingReq of receta.ingredientes) {
+            for (const ingReq of receta.ingredientes_necesarios) {
                 const dbIng = ingredientesDb.find(i => i.id === ingReq.ingredienteId);
                 if (dbIng) {
                     const totalConsumido = ingReq.cantidad * factor;
@@ -255,105 +218,134 @@ export default function ProduccionPage() {
             <div className="mt-6">
                 {/* RECIPES TAB */}
                 {activeTab === 'recetas' && (
-                    <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                        {/* Recipe Form Modal/Inline */}
-                        {showRecipeForm && (
-                            <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
-                                <h3 className="text-lg font-semibold mb-4 text-slate-800">Crear Escandallo</h3>
-                                <form onSubmit={handleSaveRecipe}>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Nombre de la Receta</label>
-                                            <input required type="text" value={recipeData.nombre} onChange={e => setRecipeData({ ...recipeData, nombre: e.target.value })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                        {/* Left column: Recipes List */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <h3 className="text-lg font-bold text-slate-800 border-b border-slate-200 pb-2">Directorio de Recetas</h3>
+                            {loading ? (
+                                <div className="text-center text-slate-500 py-8">Cargando recetas...</div>
+                            ) : recetas.length === 0 ? (
+                                <div className="text-center text-slate-500 py-8 bg-white rounded-lg border border-slate-200 shadow-sm">No hay recetas registradas.</div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {recetas.map(receta => (
+                                        <div key={receta.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <h3 className="font-bold text-slate-900 text-lg">{receta.nombre}</h3>
+                                                <button onClick={() => receta.id && handleDeleteRecipe(receta.id)} className="text-slate-400 hover:text-red-500"><Trash2 size={16} /></button>
+                                            </div>
+                                            <div className="space-y-3 mb-4">
+                                                <div className="flex items-center justify-between text-sm text-slate-600 border-b border-slate-50 pb-2">
+                                                    <span className="flex items-center"><Scale size={16} className="mr-2 text-slate-400" /> Rendimiento</span>
+                                                    <span className="font-medium text-slate-900">{receta.rendimiento} uds</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-sm text-slate-600 border-b border-slate-50 pb-2">
+                                                    <span className="flex items-center"><Clock size={16} className="mr-2 text-slate-400" /> Tiempo</span>
+                                                    <span className="font-medium text-slate-900">{receta.tiempoEstimado} min</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-sm text-slate-600 border-b border-slate-50 pb-2">
+                                                    <span className="flex items-center"><Euro size={16} className="mr-2 text-slate-400" /> Coste Est.</span>
+                                                    <span className="font-medium text-slate-900">{receta.costeProduccion} €</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-sm text-slate-600">
+                                                    <span className="flex items-center"><List size={16} className="mr-2 text-slate-400" /> Componentes</span>
+                                                    <span className="font-medium text-slate-900">{receta.ingredientes_necesarios?.length || 0}</span>
+                                                </div>
+                                            </div>
+                                            <div className="pt-4 border-t border-slate-100">
+                                                <button onClick={() => handlePlanOrder(receta)} className="text-sm bg-slate-50 text-blue-600 font-medium hover:bg-blue-50 hover:text-blue-700 w-full text-center py-2 rounded-md transition-colors">Planificar Orden</button>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Rendimiento (Unidades)</label>
-                                            <input required type="number" min="1" value={recipeData.rendimiento} onChange={e => setRecipeData({ ...recipeData, rendimiento: Number(e.target.value) })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right column: Form */}
+                        <div className="lg:col-span-1">
+                            {showRecipeForm ? (
+                                <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm sticky top-6">
+                                    <h3 className="text-lg font-semibold mb-4 text-slate-800">Definir Escandallo</h3>
+                                    <form onSubmit={handleSaveRecipe}>
+                                        <div className="space-y-4 mb-6">
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">Nombre de la Receta</label>
+                                                <input required type="text" value={recipeData.nombre} onChange={e => setRecipeData({ ...recipeData, nombre: e.target.value })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs font-medium text-slate-600 mb-1">Unidades</label>
+                                                    <input required type="number" min="1" value={recipeData.rendimiento} onChange={e => setRecipeData({ ...recipeData, rendimiento: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-slate-600 mb-1">Tiempo (min)</label>
+                                                    <input required type="number" min="1" value={recipeData.tiempoEstimado} onChange={e => setRecipeData({ ...recipeData, tiempoEstimado: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 mb-1">Coste Estimado (€)</label>
+                                                <input required type="number" step="0.01" min="0" value={recipeData.costeProduccion} onChange={e => setRecipeData({ ...recipeData, costeProduccion: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Tiempo Estimado (Minutos)</label>
-                                            <input required type="number" min="1" value={recipeData.tiempoEstimado} onChange={e => setRecipeData({ ...recipeData, tiempoEstimado: Number(e.target.value) })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+
+                                        {/* Ingredient Adder */}
+                                        <div className="bg-slate-50 p-4 rounded-md border border-slate-200 mb-6">
+                                            <h4 className="text-sm font-medium text-slate-700 mb-3">Añadir Ingredientes</h4>
+                                            <div className="flex gap-4 items-end flex-wrap">
+                                                <div className="flex-1 min-w-[150px]">
+                                                    <label className="block text-xs text-slate-500 mb-1">Seleccionar Ingrediente</label>
+                                                    <select value={currentIngId} onChange={e => setCurrentIngId(e.target.value)} className="w-full rounded-md border-0 py-2 pl-3 pr-8 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white">
+                                                        <option value="">-- Elige un ingrediente --</option>
+                                                        {ingredientesDb.map(ing => (
+                                                            <option key={ing.id} value={ing.id}>{ing.nombre} ({ing.SKU})</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="w-24">
+                                                    <label className="block text-xs text-slate-500 mb-1">Cant.</label>
+                                                    <input type="number" min="0" step="0.01" value={currentIngQty} onChange={e => setCurrentIngQty(Number(e.target.value))} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                                </div>
+                                                <button type="button" onClick={handleAddIngredientToRecipe} className="bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-700">Añadir</button>
+                                            </div>
+
+                                            {/* Current Ingredients List */}
+                                            {recipeData.ingredientes_necesarios.length > 0 && (
+                                                <div className="mt-4 border-t border-slate-200 pt-4">
+                                                    <ul className="space-y-2">
+                                                        {recipeData.ingredientes_necesarios.map((ing, idx) => (
+                                                            <li key={idx} className="flex justify-between items-center bg-white px-3 py-2 rounded border border-slate-100 text-sm">
+                                                                <span className="font-medium text-slate-700 truncate">{ing.nombre}</span>
+                                                                <div className="flex items-center gap-3 flex-shrink-0">
+                                                                    <span className="text-slate-500 font-mono text-xs">{ing.cantidad} {ing.unidad}</span>
+                                                                    <button type="button" onClick={() => handleRemoveIngredientFromRecipe(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
+
+                                        <div className="flex flex-col gap-2 pt-2">
+                                            <button type="submit" disabled={recipeData.ingredientes_necesarios.length === 0} className="w-full py-2.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors">Guardar Receta</button>
+                                            <button type="button" onClick={() => setShowRecipeForm(false)} className="w-full py-2.5 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-md transition-colors">Cancelar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            ) : (
+                                <div className="bg-slate-50 border border-slate-200 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
+                                    <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4">
+                                        <BookOpen size={32} />
                                     </div>
-
-                                    {/* Ingredient Adder */}
-                                    <div className="bg-slate-50 p-4 rounded-md border border-slate-200 mb-6">
-                                        <h4 className="text-sm font-medium text-slate-700 mb-3">Añadir Ingredientes</h4>
-                                        <div className="flex gap-4 items-end">
-                                            <div className="flex-1">
-                                                <label className="block text-xs text-slate-500 mb-1">Seleccionar Ingrediente</label>
-                                                <select value={currentIngId} onChange={e => setCurrentIngId(e.target.value)} className="w-full rounded-md border-0 py-1.5 pl-3 pr-8 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white">
-                                                    <option value="">-- Elige un ingrediente --</option>
-                                                    {ingredientesDb.map(ing => (
-                                                        <option key={ing.id} value={ing.id}>{ing.nombre} ({ing.SKU})</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div className="w-32">
-                                                <label className="block text-xs text-slate-500 mb-1">Cantidad (uds/kg)</label>
-                                                <input type="number" min="0" step="0.01" value={currentIngQty} onChange={e => setCurrentIngQty(Number(e.target.value))} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
-                                            </div>
-                                            <button type="button" onClick={handleAddIngredientToRecipe} className="bg-slate-800 text-white px-4 py-1.5 rounded-md text-sm font-medium hover:bg-slate-700">Añadir</button>
-                                        </div>
-
-                                        {/* Current Ingredients List */}
-                                        {recipeData.ingredientes.length > 0 && (
-                                            <div className="mt-4 border-t border-slate-200 pt-4">
-                                                <ul className="space-y-2">
-                                                    {recipeData.ingredientes.map((ing, idx) => (
-                                                        <li key={idx} className="flex justify-between items-center bg-white px-3 py-2 rounded border border-slate-100 text-sm">
-                                                            <span className="font-medium text-slate-700">{ing.nombre}</span>
-                                                            <div className="flex items-center gap-4">
-                                                                <span className="text-slate-500">{ing.cantidad} {ing.unidad}</span>
-                                                                <button type="button" onClick={() => handleRemoveIngredientFromRecipe(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
-                                                            </div>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex justify-end gap-3">
-                                        <button type="button" onClick={() => setShowRecipeForm(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md">Cancelar</button>
-                                        <button type="submit" disabled={recipeData.ingredientes.length === 0} className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">Guardar Receta</button>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-
-                        {/* Recipes List */}
-                        {loading ? (
-                            <div className="text-center text-slate-500 py-8">Cargando recetas...</div>
-                        ) : recetas.length === 0 ? (
-                            <div className="text-center text-slate-500 py-8 bg-white rounded-lg border border-slate-200 shadow-sm">No hay recetas registradas.</div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {recetas.map(receta => (
-                                    <div key={receta.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <h3 className="font-bold text-slate-900 text-lg">{receta.nombre}</h3>
-                                            <button onClick={() => receta.id && handleDeleteRecipe(receta.id)} className="text-slate-400 hover:text-red-500"><Trash2 size={16} /></button>
-                                        </div>
-                                        <div className="space-y-3 mb-4">
-                                            <div className="flex items-center text-sm text-slate-600">
-                                                <Scale size={16} className="mr-2 text-slate-400" /> Rendimiento: <span className="font-medium text-slate-900 ml-1">{receta.rendimiento} uds</span>
-                                            </div>
-                                            <div className="flex items-center text-sm text-slate-600">
-                                                <Clock size={16} className="mr-2 text-slate-400" /> Tiempo: <span className="font-medium text-slate-900 ml-1">{receta.tiempoEstimado} min</span>
-                                            </div>
-                                            <div className="flex items-center text-sm text-slate-600">
-                                                <List size={16} className="mr-2 text-slate-400" /> Ingredientes: <span className="font-medium text-slate-900 ml-1">{receta.ingredientes.length}</span>
-                                            </div>
-                                        </div>
-                                        <div className="pt-4 border-t border-slate-100">
-                                            <button onClick={() => handlePlanOrder(receta)} className="text-sm text-blue-600 font-medium hover:text-blue-700 w-full text-center">Planificar Orden</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                    <h3 className="text-slate-800 font-medium mb-2">Editor de Escandallos</h3>
+                                    <p className="text-sm text-slate-500 mb-6 max-w-[250px]">Crea nuevas recetas definiendo los ingredientes extraídos de tu inventario real.</p>
+                                    <button onClick={() => setShowRecipeForm(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-md font-medium text-sm transition-colors shadow-sm">
+                                        <Plus size={16} /> Crear Nueva Receta
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -413,10 +405,10 @@ export default function ProduccionPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{orden.cantidadObjetivo} <span className="text-slate-400 font-normal">uds</span></td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        ${orden.estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : ''}
-                                                        ${orden.estado === 'enProceso' ? 'bg-blue-100 text-blue-800' : ''}
-                                                        ${orden.estado === 'completada' ? 'bg-emerald-100 text-emerald-800' : ''}
-                                                    `}>
+                                                            ${orden.estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : ''}
+                                                            ${orden.estado === 'enProceso' ? 'bg-blue-100 text-blue-800' : ''}
+                                                            ${orden.estado === 'completada' ? 'bg-emerald-100 text-emerald-800' : ''}
+                                                        `}>
                                                         {orden.estado === 'pendiente' && 'PENDIENTE'}
                                                         {orden.estado === 'enProceso' && 'EN PROCESO'}
                                                         {orden.estado === 'completada' && 'COMPLETADA'}

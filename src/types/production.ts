@@ -8,9 +8,10 @@ export interface RecipeIngredient {
 export interface Recipe {
     id?: string;
     nombre: string;
-    ingredientes: RecipeIngredient[];
+    ingredientes_necesarios: RecipeIngredient[]; // Rename and enforce DB structure
     rendimiento: number; // Unidades que produce esta receta
     tiempoEstimado: number; // En minutos
+    costeProduccion: number; // Coste total estimado en €
 }
 
 export interface ProductionOrder {
