@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Invoice } from "@/types/billing";
 import { Client, SaleOrder, SaleOrderItem } from "@/types/clients";
+import { useSettings } from "@/hooks/useFirebaseData";
 
 export default function FacturacionPage() {
     const { user } = useAuth();
@@ -17,6 +18,8 @@ export default function FacturacionPage() {
     const [clientes, setClientes] = useState<Client[]>([]);
     const [pedidos, setPedidos] = useState<SaleOrder[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const { settings } = useSettings();
 
     // Print State
     const [invoiceToPrint, setInvoiceToPrint] = useState<Invoice | null>(null);
@@ -200,9 +203,11 @@ export default function FacturacionPage() {
                             <p className="text-lg text-slate-500 mt-2 font-medium">{invoiceToPrint.numeroFactura}</p>
                         </div>
                         <div className="text-right">
-                            <p className="font-bold text-slate-800 text-lg">BakeryOS</p>
-                            <p className="text-slate-500">Documento Fiscal</p>
-                            <p className="text-slate-500">Fecha: {new Date(invoiceToPrint.fechaEmision).toLocaleDateString()}</p>
+                            <p className="font-bold text-slate-800 text-lg">{settings?.business?.razonSocial || "Tu Panadería"}</p>
+                            <p className="text-slate-500">{settings?.business?.cif || "CIF: 00000000"}</p>
+                            <p className="text-slate-500">{settings?.business?.direccion || "Dirección del local"}</p>
+                            <p className="text-slate-500">{settings?.business?.telefono || "Teléfono"}</p>
+                            <p className="text-slate-500 mt-2">Fecha: {new Date(invoiceToPrint.fechaEmision).toLocaleDateString()}</p>
                         </div>
                     </div>
 
@@ -438,7 +443,7 @@ export default function FacturacionPage() {
                                         <input type="text" placeholder="Concepto (ej. Tarta Sacher)" value={currentItemName} onChange={e => setCurrentItemName(e.target.value)} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                     </div>
                                     <div className="w-20">
-                                        <input type="number" min="1" placeholder="Cant." value={currentItemQty} onChange={e => setCurrentItemQty(Number(e.target.value))} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                        <input type="number" min="1" step="1" placeholder="Cant." value={currentItemQty} onChange={e => setCurrentItemQty(Number(e.target.value))} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                     </div>
                                     <div className="w-28">
                                         <input type="number" min="0" step="0.01" placeholder="Precio U." value={currentItemPrice} onChange={e => setCurrentItemPrice(Number(e.target.value))} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />

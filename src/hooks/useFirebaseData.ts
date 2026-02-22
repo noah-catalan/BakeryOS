@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, query, orderBy, where } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, where, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Recipe, ProductionOrder } from "@/types/production";
 import { Ingredient } from "@/types/inventory";
+import { UserSettings, BusinessSettings } from "@/types/settings";
 
 // Hook to fetch and manage Recipes
 export function useRecipes() {
@@ -94,4 +95,33 @@ export function useIngredients() {
     }, [user]);
 
     return { ingredientes, loading };
+}
+
+// Hook to fetch and manage Settings
+export function useSettings() {
+    const [settings, setSettings] = useState<{ user?: UserSettings, business?: BusinessSettings } | null>(null);
+    const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (!user) {
+            setSettings(null);
+            setLoading(false);
+            return;
+        }
+
+        const docRef = doc(db, "settings", user.uid);
+        const unsubscribe = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                setSettings(docSnap.data() as { user?: UserSettings, business?: BusinessSettings });
+            } else {
+                setSettings(null);
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [user]);
+
+    return { settings, loading };
 }

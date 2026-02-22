@@ -2,8 +2,11 @@
 
 import { Menu, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
+import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 const ROUTE_TITLES: Record<string, string> = {
     '/': 'Dashboard Operativo',
@@ -16,7 +19,24 @@ const ROUTE_TITLES: Record<string, string> = {
 
 export default function Topbar({ toggleMobile }: { toggleMobile: () => void }) {
     const pathname = usePathname();
+    const { user } = useAuth();
     const title = ROUTE_TITLES[pathname] || 'Panel de control';
+    const [businessName, setBusinessName] = useState<string>("Cargando...");
+
+    useEffect(() => {
+        if (!user) {
+            setBusinessName("Panel de Control");
+            return;
+        }
+        const unsubscribe = onSnapshot(doc(db, "settings", user.uid), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().business?.razonSocial) {
+                setBusinessName(docSnap.data().business.razonSocial);
+            } else {
+                setBusinessName("Mi Panadería");
+            }
+        });
+        return () => unsubscribe();
+    }, [user]);
 
     const handleLogout = async () => {
         try {
@@ -40,8 +60,8 @@ export default function Topbar({ toggleMobile }: { toggleMobile: () => void }) {
                     {title}
                 </h1>
             </div>
-            <h1 className="text-xl font-semibold text-slate-800">
-                Panel de Control
+            <h1 className="text-xl font-bold text-slate-900 absolute left-1/2 -translate-x-1/2 hidden md:block">
+                {businessName}
             </h1>
 
             {/* Right Side: Logout */}

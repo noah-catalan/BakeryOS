@@ -15,6 +15,9 @@ import {
     ChevronLeft,
     X
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface SidebarProps {
     isMobileOpen: boolean;
@@ -25,6 +28,26 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
     const [isCollapsed, setIsCollapsed] = useState(false);
     const sidebarRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
+    const { user } = useAuth();
+
+    const [profileName, setProfileName] = useState<string>("Usuario");
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+    // Fetch user settings
+    useEffect(() => {
+        if (!user) return;
+        const unsubscribe = onSnapshot(doc(db, "settings", user.uid), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().user) {
+                const userData = docSnap.data().user;
+                setProfileName(userData.nombre || user.displayName || user.email?.split('@')[0] || "Usuario");
+                setAvatarUrl(userData.avatarUrl || user.photoURL || null);
+            } else {
+                setProfileName(user.displayName || user.email?.split('@')[0] || "Usuario");
+                setAvatarUrl(user.photoURL || null);
+            }
+        });
+        return () => unsubscribe();
+    }, [user]);
 
     // Close sidebar on outside click if it's open (not collapsed)
     useEffect(() => {
@@ -212,10 +235,14 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
                 {/* User Profile */}
                 <div className="border-t border-slate-200 p-4">
                     <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} rounded-md ${isCollapsed ? 'p-1' : 'p-2'} hover:bg-slate-50 cursor-pointer`}>
-                        <UserCircle size={36} className="text-slate-400 flex-shrink-0" />
+                        {avatarUrl ? (
+                            <img src={avatarUrl} alt="Avatar" className="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-slate-200" />
+                        ) : (
+                            <UserCircle size={36} className="text-slate-400 flex-shrink-0" />
+                        )}
                         {!isCollapsed && (
                             <div className="flex flex-col whitespace-nowrap overflow-hidden">
-                                <span className="text-sm font-semibold text-slate-900">Noah Catalán</span>
+                                <span className="text-sm font-semibold text-slate-900">{profileName}</span>
                                 <span className="text-xs text-slate-500">Admin</span>
                             </div>
                         )}

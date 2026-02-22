@@ -10,6 +10,7 @@ export interface BusinessSettings {
 
 export interface UserSettings {
     nombre: string;
+    avatarUrl?: string;
     temaVisual: 'light' | 'dark' | 'system';
     notificacionesEmail: boolean;
     notificacionesPush: boolean;

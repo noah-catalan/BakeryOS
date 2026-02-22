@@ -18,6 +18,7 @@ export default function ClientesPage() {
 
     // Form State for Clients
     const [showClientForm, setShowClientForm] = useState(false);
+    const [editingClientId, setEditingClientId] = useState<string | null>(null);
     const [clientData, setClientData] = useState<Omit<Client, 'id'>>({
         nombre: '',
         tipo: 'B2B',
@@ -84,13 +85,33 @@ export default function ClientesPage() {
     const handleSaveClient = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await addDoc(collection(db, "clientes"), { ...clientData, fechaRegistro: Date.now(), userId: user?.uid });
+            if (editingClientId) {
+                await updateDoc(doc(db, "clientes", editingClientId), { ...clientData });
+            } else {
+                await addDoc(collection(db, "clientes"), { ...clientData, fechaRegistro: Date.now(), userId: user?.uid });
+            }
+            // Reset
+            setEditingClientId(null);
             setClientData({ nombre: '', tipo: 'B2B', email: '', telefono: '', direccion: '', fechaRegistro: Date.now() });
             setShowClientForm(false);
         } catch (error) {
-            console.error("Error creating client:", error);
+            console.error("Error creating/updating client:", error);
             alert("Error al guardar el cliente.");
         }
+    };
+
+    const handleEditClient = (cliente: Client) => {
+        setEditingClientId(cliente.id || null);
+        setClientData({
+            nombre: cliente.nombre,
+            tipo: cliente.tipo,
+            email: cliente.email,
+            telefono: cliente.telefono,
+            direccion: cliente.direccion,
+            fechaRegistro: cliente.fechaRegistro
+        });
+        setActiveTab('directorio');
+        setShowClientForm(true);
     };
 
     const handleDeleteClient = async (id: string) => {
@@ -211,7 +232,7 @@ export default function ClientesPage() {
                         {/* Client Form */}
                         {showClientForm && (
                             <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm w-full mb-6">
-                                <h3 className="text-lg font-semibold mb-4 text-slate-800">Registrar Cliente</h3>
+                                <h3 className="text-lg font-semibold mb-4 text-slate-800">{editingClientId ? 'Editar Cliente' : 'Registrar Cliente'}</h3>
                                 <form onSubmit={handleSaveClient}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                         <div>
@@ -239,8 +260,8 @@ export default function ClientesPage() {
                                         </div>
                                     </div>
                                     <div className="flex justify-end gap-3">
-                                        <button type="button" onClick={() => setShowClientForm(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md">Cancelar</button>
-                                        <button type="submit" className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700">Guardar Cliente</button>
+                                        <button type="button" onClick={() => { setShowClientForm(false); setEditingClientId(null); setClientData({ nombre: '', tipo: 'B2B', email: '', telefono: '', direccion: '', fechaRegistro: Date.now() }); }} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md">Cancelar</button>
+                                        <button type="submit" className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700">{editingClientId ? 'Guardar Cambios' : 'Guardar Cliente'}</button>
                                     </div>
                                 </form>
                             </div>
@@ -263,7 +284,10 @@ export default function ClientesPage() {
                                                     <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{cliente.tipo}</span>
                                                 </div>
                                             </div>
-                                            <button onClick={() => cliente.id && handleDeleteClient(cliente.id)} className="text-slate-400 hover:text-red-500"><Trash2 size={16} /></button>
+                                            <div className="flex items-center gap-2">
+                                                <button onClick={() => handleEditClient(cliente)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Editar"><User size={16} /></button>
+                                                <button onClick={() => cliente.id && handleDeleteClient(cliente.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Eliminar"><Trash2 size={16} /></button>
+                                            </div>
                                         </div>
                                         <div className="space-y-2 mb-4">
                                             <div className="flex items-center text-sm text-slate-600">

@@ -174,27 +174,30 @@ export default function Home() {
       const demoRecetas = [
         {
           nombre: "Barra Rústica", mermasPermitidas: 2, ultimaAct: Date.now(), userId: user?.uid,
-          ingredientes: [
-            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.25, unidad: ingRefs[0].unidad },
-            { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.005, unidad: ingRefs[1].unidad },
-            { ingredienteId: ingRefs[3].id, nombre: ingRefs[3].nombre, cantidad: 0.005, unidad: ingRefs[3].unidad }
+          rendimiento: 50, tiempoEstimado: 240, costeProduccion: 5.25,
+          ingredientes_necesarios: [
+            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 12.5, unidad: ingRefs[0].unidad },
+            { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.25, unidad: ingRefs[1].unidad },
+            { ingredienteId: ingRefs[3].id, nombre: ingRefs[3].nombre, cantidad: 0.25, unidad: ingRefs[3].unidad }
           ]
         },
         {
           nombre: "Croissant de Mantequilla", mermasPermitidas: 5, ultimaAct: Date.now(), userId: user?.uid,
-          ingredientes: [
-            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.05, unidad: ingRefs[0].unidad },
-            { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.002, unidad: ingRefs[1].unidad },
-            { ingredienteId: ingRefs[2].id, nombre: ingRefs[2].nombre, cantidad: 0.025, unidad: ingRefs[2].unidad },
-            { ingredienteId: ingRefs[4].id, nombre: ingRefs[4].nombre, cantidad: 0.005, unidad: ingRefs[4].unidad }
+          rendimiento: 40, tiempoEstimado: 180, costeProduccion: 16.40,
+          ingredientes_necesarios: [
+            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 2.5, unidad: ingRefs[0].unidad },
+            { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.1, unidad: ingRefs[1].unidad },
+            { ingredienteId: ingRefs[2].id, nombre: ingRefs[2].nombre, cantidad: 1.25, unidad: ingRefs[2].unidad },
+            { ingredienteId: ingRefs[4].id, nombre: ingRefs[4].nombre, cantidad: 0.25, unidad: ingRefs[4].unidad }
           ]
         },
         {
           nombre: "Napolitana de Chocolate", mermasPermitidas: 5, ultimaAct: Date.now(), userId: user?.uid,
-          ingredientes: [
-            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.05, unidad: ingRefs[0].unidad },
-            { ingredienteId: ingRefs[2].id, nombre: ingRefs[2].nombre, cantidad: 0.025, unidad: ingRefs[2].unidad },
-            { ingredienteId: ingRefs[5].id, nombre: ingRefs[5].nombre, cantidad: 0.015, unidad: ingRefs[5].unidad }
+          rendimiento: 35, tiempoEstimado: 190, costeProduccion: 18.20,
+          ingredientes_necesarios: [
+            { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 2.5, unidad: ingRefs[0].unidad },
+            { ingredienteId: ingRefs[2].id, nombre: ingRefs[2].nombre, cantidad: 1.25, unidad: ingRefs[2].unidad },
+            { ingredienteId: ingRefs[5].id, nombre: ingRefs[5].nombre, cantidad: 0.8, unidad: ingRefs[5].unidad }
           ]
         }
       ];

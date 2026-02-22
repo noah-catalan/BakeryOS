@@ -139,14 +139,14 @@ export default function InventarioPage() {
                             <div className="w-1/2">
                                 <label className="block text-xs font-medium text-slate-600 mb-1">Stock</label>
                                 <input
-                                    required type="number" min="0" step="0.01"
+                                    required type="number" min="0" step="1"
                                     value={formData.stockActual} onChange={e => setFormData({ ...formData, stockActual: Number(e.target.value) })}
                                     className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-blue-600 outline-none"
                                 />
                             </div>
                             <div className="w-1/2">
                                 <label className="block text-xs font-medium text-slate-600 mb-1">Mínimo</label>
-                                <input type="number" required placeholder="0" className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white"
+                                <input type="number" required placeholder="0" step="1" className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white"
                                     value={formData.stockMinimo} onChange={e => setFormData({ ...formData, stockMinimo: Number(e.target.value) })}
                                 />
                             </div>
@@ -179,7 +179,7 @@ export default function InventarioPage() {
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     Categoría
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     Stock / Mínimo
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -202,7 +202,7 @@ export default function InventarioPage() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                                         {ing.categoria}
                                     </td>
-                                    <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 text-right">
+                                    <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 text-center">
                                         {ing.stockActual} <span className="text-slate-400 font-normal">/ {ing.stockMinimo}</span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">

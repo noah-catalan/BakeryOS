@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 import ClientLayout from "@/components/layout/ClientLayout";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 export default function RootLayout({
   children,
@@ -29,15 +30,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300`}
       >
-        <AuthProvider>
-          <AuthGuard>
-            <ClientLayout>
-              {children}
-            </ClientLayout>
-          </AuthGuard>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <AuthGuard>
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+            </AuthGuard>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

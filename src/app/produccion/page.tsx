@@ -305,11 +305,11 @@ export default function ProduccionPage() {
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-xs font-medium text-slate-600 mb-1">Unidades</label>
-                                                    <input required type="number" min="1" value={recipeData.rendimiento} onChange={e => setRecipeData({ ...recipeData, rendimiento: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                                    <input required type="number" min="1" step="1" value={recipeData.rendimiento} onChange={e => setRecipeData({ ...recipeData, rendimiento: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                                 </div>
                                                 <div>
                                                     <label className="block text-xs font-medium text-slate-600 mb-1">Tiempo (min)</label>
-                                                    <input required type="number" min="1" value={recipeData.tiempoEstimado} onChange={e => setRecipeData({ ...recipeData, tiempoEstimado: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                                    <input required type="number" min="1" step="1" value={recipeData.tiempoEstimado} onChange={e => setRecipeData({ ...recipeData, tiempoEstimado: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                                 </div>
                                             </div>
                                             <div>
@@ -401,7 +401,7 @@ export default function ProduccionPage() {
                                     </div>
                                     <div>
                                         <label className="block text-xs font-medium text-slate-600 mb-1">Unidades Objetivo</label>
-                                        <input required type="number" min="1" value={orderData.cantidadObjetivo} onChange={e => setOrderData({ ...orderData, cantidadObjetivo: Number(e.target.value) })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                        <input required type="number" min="1" step="1" value={orderData.cantidadObjetivo} onChange={e => setOrderData({ ...orderData, cantidadObjetivo: Number(e.target.value) })} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                     </div>
                                     <div className="flex justify-end gap-3 pt-4">
                                         <button type="button" onClick={() => setShowOrderForm(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-md">Cancelar</button>
