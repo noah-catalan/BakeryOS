@@ -94,7 +94,7 @@ export default function InventarioPage() {
         <div className="p-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900">Inventario de Materias Primas</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Inventario de Materias Primas</h2>
                     <p className="text-sm text-slate-500 mt-1">Gestiona el stock de ingredientes y alertas.</p>
                 </div>
                 <button
@@ -108,7 +108,7 @@ export default function InventarioPage() {
 
             {/* Basic Inline Add Form */}
             {showForm && (
-                <div className="bg-white p-6 rounded-lg border border-slate-200 mb-8 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 mb-8 shadow-sm">
                     <h3 className="text-lg font-semibold mb-4 text-slate-800">Añadir Ingrediente</h3>
                     <form onSubmit={handleAddIngredient} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                         <div>
@@ -146,7 +146,7 @@ export default function InventarioPage() {
                             </div>
                             <div className="w-1/2">
                                 <label className="block text-xs font-medium text-slate-600 mb-1">Mínimo</label>
-                                <input type="number" required placeholder="0" step="1" className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white"
+                                <input type="number" required placeholder="0" step="1" className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-900"
                                     value={formData.stockMinimo} onChange={e => setFormData({ ...formData, stockMinimo: Number(e.target.value) })}
                                 />
                             </div>
@@ -161,7 +161,7 @@ export default function InventarioPage() {
             )}
 
             {/* Main Table Area */}
-            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
                 {loading ? (
                     <div className="p-8 text-center text-slate-500">Cargando inventario...</div>
                 ) : ingredientes.length === 0 ? (
@@ -190,10 +190,10 @@ export default function InventarioPage() {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-slate-200">
+                        <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-200">
                             {ingredientes.map((ing) => (
                                 <tr key={ing.id} className="hover:bg-slate-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-slate-50">
                                         {ing.nombre}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">

@@ -47,7 +47,7 @@ export default function Topbar({ toggleMobile }: { toggleMobile: () => void }) {
     };
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 md:px-8 shadow-sm print:hidden">
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white dark:bg-slate-900 px-4 md:px-8 shadow-sm print:hidden">
             {/* Left Side: Mobile Menu Toggle & Title */}
             <div className="flex items-center gap-4">
                 <button
@@ -60,7 +60,7 @@ export default function Topbar({ toggleMobile }: { toggleMobile: () => void }) {
                     {title}
                 </h1>
             </div>
-            <h1 className="text-xl font-bold text-slate-900 absolute left-1/2 -translate-x-1/2 hidden md:block">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50 absolute left-1/2 -translate-x-1/2 hidden md:block">
                 {businessName}
             </h1>
 

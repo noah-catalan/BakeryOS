@@ -28,13 +28,13 @@ export default function LoginPage() {
     return (
         <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-slate-900">
+                <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-slate-900 dark:text-slate-50">
                     Iniciar sesión en BakeryOS
                 </h2>
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-                <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+                <div className="bg-white dark:bg-slate-900 px-6 py-12 shadow sm:rounded-lg sm:px-12">
                     <form className="space-y-6" onSubmit={handleLogin}>
                         {error && (
                             <div className="rounded-md bg-red-50 p-4">
@@ -45,7 +45,7 @@ export default function LoginPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-sm font-medium leading-6 text-slate-900"
+                                className="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-50"
                             >
                                 Correo electrónico
                             </label>
@@ -58,7 +58,7 @@ export default function LoginPage() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3"
+                                    className="block w-full rounded-md border-0 py-1.5 text-slate-900 dark:text-slate-50 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3"
                                 />
                             </div>
                         </div>
@@ -66,7 +66,7 @@ export default function LoginPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium leading-6 text-slate-900"
+                                className="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-50"
                             >
                                 Contraseña
                             </label>
@@ -79,7 +79,7 @@ export default function LoginPage() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3"
+                                    className="block w-full rounded-md border-0 py-1.5 text-slate-900 dark:text-slate-50 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 px-3"
                                 />
                             </div>
                         </div>

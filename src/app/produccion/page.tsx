@@ -196,7 +196,7 @@ export default function ProduccionPage() {
         <div className="p-8 max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900">Módulo de Producción</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Módulo de Producción</h2>
                     <p className="text-sm text-slate-500 mt-1">Gestiona tus escandallos y planifica órdenes de horneado.</p>
                 </div>
                 <button
@@ -248,13 +248,13 @@ export default function ProduccionPage() {
                             {loading ? (
                                 <div className="text-center text-slate-500 py-8">Cargando recetas...</div>
                             ) : recetas.length === 0 ? (
-                                <div className="text-center text-slate-500 py-8 bg-white rounded-lg border border-slate-200 shadow-sm">No hay recetas registradas.</div>
+                                <div className="text-center text-slate-500 py-8 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 shadow-sm">No hay recetas registradas.</div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {recetas.map(receta => (
-                                        <div key={receta.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+                                        <div key={receta.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
                                             <div className="flex justify-between items-start mb-4">
-                                                <h3 className="font-bold text-slate-900 text-lg">{receta.nombre}</h3>
+                                                <h3 className="font-bold text-slate-900 dark:text-slate-50 text-lg">{receta.nombre}</h3>
                                                 <div className="flex items-center gap-2">
                                                     <button onClick={() => handleEditRecipe(receta)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Editar"><Edit size={16} /></button>
                                                     <button onClick={() => receta.id && handleDeleteRecipe(receta.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Eliminar"><Trash2 size={16} /></button>
@@ -263,19 +263,19 @@ export default function ProduccionPage() {
                                             <div className="space-y-3 mb-4">
                                                 <div className="flex items-center justify-between text-sm text-slate-600 border-b border-slate-50 pb-2">
                                                     <span className="flex items-center"><Scale size={16} className="mr-2 text-slate-400" /> Rendimiento</span>
-                                                    <span className="font-medium text-slate-900">{receta.rendimiento} uds</span>
+                                                    <span className="font-medium text-slate-900 dark:text-slate-50">{receta.rendimiento} uds</span>
                                                 </div>
                                                 <div className="flex items-center justify-between text-sm text-slate-600 border-b border-slate-50 pb-2">
                                                     <span className="flex items-center"><Clock size={16} className="mr-2 text-slate-400" /> Tiempo</span>
-                                                    <span className="font-medium text-slate-900">{receta.tiempoEstimado} min</span>
+                                                    <span className="font-medium text-slate-900 dark:text-slate-50">{receta.tiempoEstimado} min</span>
                                                 </div>
                                                 <div className="flex items-center justify-between text-sm text-slate-600 border-b border-slate-50 pb-2">
                                                     <span className="flex items-center"><Euro size={16} className="mr-2 text-slate-400" /> Coste Est.</span>
-                                                    <span className="font-medium text-slate-900">{receta.costeProduccion} €</span>
+                                                    <span className="font-medium text-slate-900 dark:text-slate-50">{receta.costeProduccion} €</span>
                                                 </div>
                                                 <div className="flex items-center justify-between text-sm text-slate-600">
                                                     <span className="flex items-center"><List size={16} className="mr-2 text-slate-400" /> Componentes</span>
-                                                    <span className="font-medium text-slate-900">{receta.ingredientes_necesarios?.length || 0}</span>
+                                                    <span className="font-medium text-slate-900 dark:text-slate-50">{receta.ingredientes_necesarios?.length || 0}</span>
                                                 </div>
                                             </div>
                                             <div className="bg-slate-50 p-3 rounded-md mt-2 flex justify-between items-center text-sm border border-slate-100">
@@ -294,7 +294,7 @@ export default function ProduccionPage() {
                         {/* Right column: Form */}
                         <div className="lg:col-span-1">
                             {showRecipeForm ? (
-                                <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm sticky top-6">
+                                <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 shadow-sm sticky top-6">
                                     <h3 className="text-lg font-semibold mb-4 text-slate-800">{editingRecipeId ? 'Editar Escandallo' : 'Definir Escandallo'}</h3>
                                     <form onSubmit={handleSaveRecipe}>
                                         <div className="space-y-4 mb-6">
@@ -314,7 +314,7 @@ export default function ProduccionPage() {
                                             </div>
                                             <div>
                                                 <label className="block text-xs font-medium text-slate-600 mb-1">Coste Estimado (€)</label>
-                                                <input required type="number" step="0.01" min="0" value={recipeData.costeProduccion} onChange={e => setRecipeData({ ...recipeData, costeProduccion: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                                <input required type="number" step="1" min="0" value={recipeData.costeProduccion} onChange={e => setRecipeData({ ...recipeData, costeProduccion: Number(e.target.value) })} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                             </div>
                                         </div>
 
@@ -324,7 +324,7 @@ export default function ProduccionPage() {
                                             <div className="flex gap-4 items-end flex-wrap">
                                                 <div className="flex-1 min-w-[150px]">
                                                     <label className="block text-xs text-slate-500 mb-1">Seleccionar Ingrediente</label>
-                                                    <select value={currentIngId} onChange={e => setCurrentIngId(e.target.value)} className="w-full rounded-md border-0 py-2 pl-3 pr-8 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white">
+                                                    <select value={currentIngId} onChange={e => setCurrentIngId(e.target.value)} className="w-full rounded-md border-0 py-2 pl-3 pr-8 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-900">
                                                         <option value="">-- Elige un ingrediente --</option>
                                                         {ingredientesDb.map(ing => (
                                                             <option key={ing.id} value={ing.id}>{ing.nombre} ({ing.SKU})</option>
@@ -333,7 +333,7 @@ export default function ProduccionPage() {
                                                 </div>
                                                 <div className="w-24">
                                                     <label className="block text-xs text-slate-500 mb-1">Cant.</label>
-                                                    <input type="number" min="0" step="0.01" value={currentIngQty} onChange={e => setCurrentIngQty(Number(e.target.value))} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
+                                                    <input type="number" min="0" step="1" value={currentIngQty} onChange={e => setCurrentIngQty(Number(e.target.value))} className="w-full rounded-md border-0 py-2 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600" />
                                                 </div>
                                                 <button type="button" onClick={handleAddIngredientToRecipe} className="bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-700">Añadir</button>
                                             </div>
@@ -343,7 +343,7 @@ export default function ProduccionPage() {
                                                 <div className="mt-4 border-t border-slate-200 pt-4">
                                                     <ul className="space-y-2">
                                                         {recipeData.ingredientes_necesarios.map((ing, idx) => (
-                                                            <li key={idx} className="flex justify-between items-center bg-white px-3 py-2 rounded border border-slate-100 text-sm">
+                                                            <li key={idx} className="flex justify-between items-center bg-white dark:bg-slate-900 px-3 py-2 rounded border border-slate-100 text-sm">
                                                                 <span className="font-medium text-slate-700 truncate">{ing.nombre}</span>
                                                                 <div className="flex items-center gap-3 flex-shrink-0">
                                                                     <span className="text-slate-500 font-mono text-xs">{ing.cantidad} {ing.unidad}</span>
@@ -386,7 +386,7 @@ export default function ProduccionPage() {
 
                         {/* Order Form Modal/Inline */}
                         {showOrderForm && (
-                            <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm w-full max-w-lg mb-6">
+                            <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-slate-200 shadow-sm w-full max-w-lg mb-6">
                                 <h3 className="text-lg font-semibold mb-4 text-slate-800">Planificar Orden de Producción</h3>
                                 <form onSubmit={handleSaveOrder} className="space-y-4">
                                     <div>
@@ -394,7 +394,7 @@ export default function ProduccionPage() {
                                         <select required value={orderData.recetaId} onChange={(e) => {
                                             const r = recetas.find(x => x.id === e.target.value);
                                             setOrderData({ ...orderData, recetaId: r?.id || '', recetaNombre: r?.nombre || '' });
-                                        }} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white">
+                                        }} className="w-full rounded-md border-0 py-1.5 px-3 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-blue-600 bg-white dark:bg-slate-900">
                                             <option value="">-- Elige un escandallo --</option>
                                             {recetas.map(receta => <option key={receta.id} value={receta.id}>{receta.nombre}</option>)}
                                         </select>
@@ -414,11 +414,11 @@ export default function ProduccionPage() {
                         {loading ? (
                             <div className="text-center text-slate-500 py-8">Cargando órdenes...</div>
                         ) : ordenes.length === 0 ? (
-                            <div className="bg-white rounded-lg border border-slate-200 p-8 text-center text-slate-500 shadow-sm">
+                            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 p-8 text-center text-slate-500 shadow-sm">
                                 No hay órdenes de producción pendientes.
                             </div>
                         ) : (
-                            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
+                            <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
                                 <table className="min-w-full divide-y divide-slate-200">
                                     <thead className="bg-slate-50">
                                         <tr>
@@ -429,11 +429,11 @@ export default function ProduccionPage() {
                                             <th className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-slate-200">
+                                    <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-200">
                                         {ordenes.map(orden => (
                                             <tr key={orden.id} className="hover:bg-slate-50">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{orden.recetaNombre}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{orden.cantidadObjetivo} <span className="text-slate-400 font-normal">uds</span></td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-slate-50">{orden.recetaNombre}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-slate-50">{orden.cantidadObjetivo} <span className="text-slate-400 font-normal">uds</span></td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                             ${orden.estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : ''}

@@ -104,7 +104,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
                                 <ChefHat size={20} fill="currentColor" />
                             </div>
                             <div className="flex-shrink-0">
-                                <h1 className="text-xl font-bold text-slate-900 leading-tight">BakeryOS</h1>
+                                <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">BakeryOS</h1>
                                 <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">ERP Panaderías v1.0</p>
                             </div>
                         </Link>
@@ -242,7 +242,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
                         )}
                         {!isCollapsed && (
                             <div className="flex flex-col whitespace-nowrap overflow-hidden">
-                                <span className="text-sm font-semibold text-slate-900">{profileName}</span>
+                                <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">{profileName}</span>
                                 <span className="text-xs text-slate-500">Admin</span>
                             </div>
                         )}

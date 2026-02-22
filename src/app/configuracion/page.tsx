@@ -99,11 +99,11 @@ export default function ConfiguracionPage() {
     return (
         <div className="p-8 max-w-4xl mx-auto">
             <div className="mb-8">
-                <h2 className="text-2xl font-bold text-slate-900">Configuración del Sistema</h2>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Configuración del Sistema</h2>
                 <p className="text-sm text-slate-500 mt-1">Ajusta los parámetros globales de la panadería y tus preferencias de usuario.</p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
                 {/* Sidebar Setup Menu */}
                 <div className="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-6 flex flex-col flex-shrink-0">
                     <nav className="space-y-2">
@@ -130,7 +130,7 @@ export default function ConfiguracionPage() {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 bg-white p-8 overflow-y-auto">
+                <div className="flex-1 bg-white dark:bg-slate-900 p-8 overflow-y-auto">
                     {saveMessage.text && (
                         <div className={`p-4 rounded-md mb-6 text-sm flex items-center ${saveMessage.type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-red-50 border border-red-200 text-red-800'}`}>
                             {saveMessage.text}
@@ -147,23 +147,23 @@ export default function ConfiguracionPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la Panadería</label>
-                                        <input type="text" value={businessData.razonSocial} onChange={e => setBusinessData({ ...businessData, razonSocial: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Panadería Europea S.L." />
+                                        <input type="text" value={businessData.razonSocial} onChange={e => setBusinessData({ ...businessData, razonSocial: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Panadería Europea S.L." />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">CIF / NIF</label>
-                                        <input type="text" value={businessData.cif} onChange={e => setBusinessData({ ...businessData, cif: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="B12345678" />
+                                        <input type="text" value={businessData.cif} onChange={e => setBusinessData({ ...businessData, cif: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="B12345678" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Email de Contacto</label>
-                                        <input type="email" value={businessData.emailContacto} onChange={e => setBusinessData({ ...businessData, emailContacto: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="hola@panaderia.com" />
+                                        <input type="email" value={businessData.emailContacto} onChange={e => setBusinessData({ ...businessData, emailContacto: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="hola@panaderia.com" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
-                                        <input type="text" value={businessData.telefono} onChange={e => setBusinessData({ ...businessData, telefono: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="+34 600 000 000" />
+                                        <input type="text" value={businessData.telefono} onChange={e => setBusinessData({ ...businessData, telefono: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="+34 600 000 000" />
                                     </div>
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Dirección Principal</label>
-                                        <input type="text" value={businessData.direccion} onChange={e => setBusinessData({ ...businessData, direccion: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Calle de la Harina 123, Madrid" />
+                                        <input type="text" value={businessData.direccion} onChange={e => setBusinessData({ ...businessData, direccion: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Calle de la Harina 123, Madrid" />
                                     </div>
                                 </div>
 
@@ -173,7 +173,7 @@ export default function ConfiguracionPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4">
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Moneda Base</label>
-                                        <select value={businessData.monedaBase} onChange={e => setBusinessData({ ...businessData, monedaBase: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white">
+                                        <select value={businessData.monedaBase} onChange={e => setBusinessData({ ...businessData, monedaBase: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white dark:bg-slate-900">
                                             <option value="EUR">Euro (€)</option>
                                             <option value="USD">Dólar ($)</option>
                                             <option value="GBP">Libra (£)</option>
@@ -181,7 +181,7 @@ export default function ConfiguracionPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">IVA por defecto (%) para nuevos clientes</label>
-                                        <input type="number" min="0" max="100" value={businessData.ivaPorDefecto} onChange={e => setBusinessData({ ...businessData, ivaPorDefecto: Number(e.target.value) })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" />
+                                        <input type="number" step="1" min="0" max="100" value={businessData.ivaPorDefecto} onChange={e => setBusinessData({ ...businessData, ivaPorDefecto: Number(e.target.value) })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" />
                                     </div>
                                 </div>
                             </div>
@@ -197,11 +197,11 @@ export default function ConfiguracionPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Mostrado</label>
-                                            <input type="text" value={userData.nombre} onChange={e => setUserData({ ...userData, nombre: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Ej: Juan Pérez" />
+                                            <input type="text" value={userData.nombre} onChange={e => setUserData({ ...userData, nombre: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Ej: Juan Pérez" />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-slate-700 mb-1">Foto de Perfil (URL pública)</label>
-                                            <input type="text" value={userData.avatarUrl || ''} onChange={e => setUserData({ ...userData, avatarUrl: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="https://..." />
+                                            <input type="text" value={userData.avatarUrl || ''} onChange={e => setUserData({ ...userData, avatarUrl: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="https://..." />
                                         </div>
                                     </div>
                                 </div>
@@ -212,7 +212,7 @@ export default function ConfiguracionPage() {
                                 <div className="space-y-4 pb-4">
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Tema Visual</label>
-                                        <select value={userData.temaVisual} onChange={e => setUserData({ ...userData, temaVisual: e.target.value as any })} className="mt-1 block w-full max-w-xs rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white">
+                                        <select value={userData.temaVisual} onChange={e => setUserData({ ...userData, temaVisual: e.target.value as any })} className="mt-1 block w-full max-w-xs rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white dark:bg-slate-900">
                                             <option value="light">Claro (Recomendado)</option>
                                             <option value="dark">Oscuro</option>
                                             <option value="system">Sincronizar con el Sistema</option>
