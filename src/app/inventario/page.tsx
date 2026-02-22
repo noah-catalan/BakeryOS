@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, deleteDoc, doc, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 import { Ingredient } from "@/types/inventory";
 import { Trash2, Plus } from "lucide-react";
 
 export default function InventarioPage() {
+    const { user } = useAuth();
     const [ingredientes, setIngredientes] = useState<Ingredient[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -23,7 +25,13 @@ export default function InventarioPage() {
 
     // Fetch data in real-time
     useEffect(() => {
-        const q = collection(db, "ingredientes");
+        if (!user) {
+            setIngredientes([]);
+            setLoading(false);
+            return;
+        }
+
+        const q = query(collection(db, "ingredientes"), where("userId", "==", user.uid));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const ingredientesData = snapshot.docs.map((doc) => ({
                 id: doc.id,
@@ -37,7 +45,7 @@ export default function InventarioPage() {
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [user]);
 
     // Calculate status based on stock
     const calculateStatus = (current: number, min: number) => {
@@ -56,7 +64,8 @@ export default function InventarioPage() {
                 stockActual: Number(formData.stockActual),
                 stockMinimo: Number(formData.stockMinimo),
                 estado: calculateStatus(Number(formData.stockActual), Number(formData.stockMinimo)),
-                ultimaAct: Date.now()
+                ultimaAct: Date.now(),
+                userId: user?.uid
             };
 
             await addDoc(collection(db, "ingredientes"), finalData);
@@ -152,7 +161,7 @@ export default function InventarioPage() {
             )}
 
             {/* Main Table Area */}
-            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
                 {loading ? (
                     <div className="p-8 text-center text-slate-500">Cargando inventario...</div>
                 ) : ingredientes.length === 0 ? (

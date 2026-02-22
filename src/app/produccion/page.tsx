@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, CalendarClock, Plus, List, Scale, Clock, Trash2, CheckCircle, Play, Euro } from "lucide-react";
+import { BookOpen, CalendarClock, Plus, List, Scale, Clock, Trash2, CheckCircle, Play, Euro, Edit } from "lucide-react";
 import { addDoc, collection, deleteDoc, doc, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 import { Recipe, RecipeIngredient, ProductionOrder } from "@/types/production";
 import { useRecipes, useProductionOrders, useIngredients } from "@/hooks/useFirebaseData";
 
 export default function ProduccionPage() {
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'recetas' | 'ordenes'>('recetas');
 
     // Hooks
@@ -19,6 +21,7 @@ export default function ProduccionPage() {
 
     // Form State for Recipes
     const [showRecipeForm, setShowRecipeForm] = useState(false);
+    const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
     const [recipeData, setRecipeData] = useState<Omit<Recipe, 'id'>>({
         nombre: '',
         ingredientes_necesarios: [],
@@ -72,13 +75,32 @@ export default function ProduccionPage() {
     const handleSaveRecipe = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await addDoc(collection(db, "recetas"), recipeData);
+            if (editingRecipeId) {
+                await updateDoc(doc(db, "recetas", editingRecipeId), { ...recipeData });
+            } else {
+                await addDoc(collection(db, "recetas"), { ...recipeData, userId: user?.uid });
+            }
+            // Reset
+            setEditingRecipeId(null);
             setRecipeData({ nombre: '', ingredientes_necesarios: [], rendimiento: 1, tiempoEstimado: 60, costeProduccion: 0 });
             setShowRecipeForm(false);
         } catch (error) {
-            console.error("Error creating recipe:", error);
+            console.error("Error creating/updating recipe:", error);
             alert("Error al guardar la receta.");
         }
+    };
+
+    const handleEditRecipe = (receta: Recipe) => {
+        setEditingRecipeId(receta.id || null);
+        setRecipeData({
+            nombre: receta.nombre,
+            ingredientes_necesarios: [...receta.ingredientes_necesarios],
+            rendimiento: receta.rendimiento,
+            tiempoEstimado: receta.tiempoEstimado,
+            costeProduccion: receta.costeProduccion
+        });
+        setActiveTab('recetas');
+        setShowRecipeForm(true);
     };
 
     const handleDeleteRecipe = async (id: string) => {
@@ -102,7 +124,7 @@ export default function ProduccionPage() {
     const handleSaveOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const newOrder = { ...orderData, fechaCreacion: Date.now() };
+            const newOrder = { ...orderData, fechaCreacion: Date.now(), userId: user?.uid };
             await addDoc(collection(db, "ordenesProduccion"), newOrder);
             setShowOrderForm(false);
         } catch (error) {
@@ -233,7 +255,10 @@ export default function ProduccionPage() {
                                         <div key={receta.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
                                             <div className="flex justify-between items-start mb-4">
                                                 <h3 className="font-bold text-slate-900 text-lg">{receta.nombre}</h3>
-                                                <button onClick={() => receta.id && handleDeleteRecipe(receta.id)} className="text-slate-400 hover:text-red-500"><Trash2 size={16} /></button>
+                                                <div className="flex items-center gap-2">
+                                                    <button onClick={() => handleEditRecipe(receta)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Editar"><Edit size={16} /></button>
+                                                    <button onClick={() => receta.id && handleDeleteRecipe(receta.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Eliminar"><Trash2 size={16} /></button>
+                                                </div>
                                             </div>
                                             <div className="space-y-3 mb-4">
                                                 <div className="flex items-center justify-between text-sm text-slate-600 border-b border-slate-50 pb-2">
@@ -253,7 +278,11 @@ export default function ProduccionPage() {
                                                     <span className="font-medium text-slate-900">{receta.ingredientes_necesarios?.length || 0}</span>
                                                 </div>
                                             </div>
-                                            <div className="pt-4 border-t border-slate-100">
+                                            <div className="bg-slate-50 p-3 rounded-md mt-2 flex justify-between items-center text-sm border border-slate-100">
+                                                <span className="text-slate-500 font-medium tracking-wide text-xs uppercase">Coste por ud.</span>
+                                                <span className="font-bold text-slate-800">{(receta.costeProduccion / (receta.rendimiento || 1)).toFixed(2)} €/ud</span>
+                                            </div>
+                                            <div className="pt-4 mt-4 border-t border-slate-100">
                                                 <button onClick={() => handlePlanOrder(receta)} className="text-sm bg-slate-50 text-blue-600 font-medium hover:bg-blue-50 hover:text-blue-700 w-full text-center py-2 rounded-md transition-colors">Planificar Orden</button>
                                             </div>
                                         </div>
@@ -266,7 +295,7 @@ export default function ProduccionPage() {
                         <div className="lg:col-span-1">
                             {showRecipeForm ? (
                                 <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm sticky top-6">
-                                    <h3 className="text-lg font-semibold mb-4 text-slate-800">Definir Escandallo</h3>
+                                    <h3 className="text-lg font-semibold mb-4 text-slate-800">{editingRecipeId ? 'Editar Escandallo' : 'Definir Escandallo'}</h3>
                                     <form onSubmit={handleSaveRecipe}>
                                         <div className="space-y-4 mb-6">
                                             <div>
@@ -328,8 +357,10 @@ export default function ProduccionPage() {
                                         </div>
 
                                         <div className="flex flex-col gap-2 pt-2">
-                                            <button type="submit" disabled={recipeData.ingredientes_necesarios.length === 0} className="w-full py-2.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors">Guardar Receta</button>
-                                            <button type="button" onClick={() => setShowRecipeForm(false)} className="w-full py-2.5 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-md transition-colors">Cancelar</button>
+                                            <button type="submit" disabled={recipeData.ingredientes_necesarios.length === 0} className="w-full py-2.5 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                                                {editingRecipeId ? 'Guardar Cambios' : 'Guardar Receta'}
+                                            </button>
+                                            <button type="button" onClick={() => { setShowRecipeForm(false); setEditingRecipeId(null); setRecipeData({ nombre: '', ingredientes_necesarios: [], rendimiento: 1, tiempoEstimado: 60, costeProduccion: 0 }); }} className="w-full py-2.5 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-md transition-colors">Cancelar</button>
                                         </div>
                                     </form>
                                 </div>
@@ -387,7 +418,7 @@ export default function ProduccionPage() {
                                 No hay órdenes de producción pendientes.
                             </div>
                         ) : (
-                            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-x-auto">
                                 <table className="min-w-full divide-y divide-slate-200">
                                     <thead className="bg-slate-50">
                                         <tr>

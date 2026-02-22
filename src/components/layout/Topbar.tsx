@@ -1,32 +1,58 @@
-import { Search, Bell } from 'lucide-react';
+"use client";
 
-export default function Topbar() {
+import { Menu, LogOut } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+
+const ROUTE_TITLES: Record<string, string> = {
+    '/': 'Dashboard Operativo',
+    '/inventario': 'Inventario',
+    '/produccion': 'Producción',
+    '/clientes': 'Clientes y Pedidos',
+    '/facturacion': 'Facturación',
+    '/configuracion': 'Configuración'
+};
+
+export default function Topbar({ toggleMobile }: { toggleMobile: () => void }) {
+    const pathname = usePathname();
+    const title = ROUTE_TITLES[pathname] || 'Panel de control';
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    };
+
     return (
-        <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-8">
-            {/* Page Title */}
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 md:px-8 shadow-sm print:hidden">
+            {/* Left Side: Mobile Menu Toggle & Title */}
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={toggleMobile}
+                    className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-md transition-colors"
+                >
+                    <Menu size={24} />
+                </button>
+                <h1 className="text-xl font-semibold text-slate-800 hidden sm:block">
+                    {title}
+                </h1>
+            </div>
             <h1 className="text-xl font-semibold text-slate-800">
                 Panel de Control
             </h1>
 
-            {/* Right Side: Search and Notifications */}
-            <div className="flex items-center gap-6">
-                {/* Search */}
-                <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Search size={16} className="text-slate-400" />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Buscar..."
-                        className="block w-64 rounded-md border-0 py-1.5 pl-9 pr-3 text-sm text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 bg-slate-50"
-                    />
-                </div>
-
-                {/* Notifications */}
-                <button type="button" className="relative rounded-full bg-white p-1 text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    <span className="sr-only">Ver notificaciones</span>
-                    <Bell size={20} />
-                    <span className="absolute top-1 right-1 block w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
+            {/* Right Side: Logout */}
+            <div className="flex items-center">
+                <button
+                    onClick={handleLogout}
+                    title="Cerrar sesion"
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors"
+                >
+                    <LogOut size={18} />
+                    <span className="hidden sm:inline">Cerrar Sesión</span>
                 </button>
             </div>
         </header>

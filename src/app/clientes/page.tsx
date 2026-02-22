@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { Users, ShoppingBag, Plus, Building2, User, Phone, Mail, MapPin, Trash2, CheckCircle, Clock } from "lucide-react";
-import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 import { Client, SaleOrder, SaleOrderItem } from "@/types/clients";
 
 export default function ClientesPage() {
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'directorio' | 'pedidos'>('directorio');
 
     // Data State
@@ -43,8 +45,16 @@ export default function ClientesPage() {
 
     // Fetch data in real-time
     useEffect(() => {
+        if (!user) {
+            setClientes([]);
+            setPedidos([]);
+            setLoading(false);
+            return;
+        }
+
         // Fetch Clients
-        const unsubscribeClientes = onSnapshot(collection(db, "clientes"), (snapshot) => {
+        const qClientes = query(collection(db, "clientes"), where("userId", "==", user.uid));
+        const unsubscribeClientes = onSnapshot(qClientes, (snapshot) => {
             const data = snapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
@@ -53,7 +63,8 @@ export default function ClientesPage() {
         });
 
         // Fetch Orders
-        const unsubscribePedidos = onSnapshot(collection(db, "pedidosVenta"), (snapshot) => {
+        const qPedidos = query(collection(db, "pedidosVenta"), where("userId", "==", user.uid));
+        const unsubscribePedidos = onSnapshot(qPedidos, (snapshot) => {
             const data = snapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
@@ -67,13 +78,13 @@ export default function ClientesPage() {
             unsubscribeClientes();
             unsubscribePedidos();
         }
-    }, []);
+    }, [user]);
 
     // --- CLIENTS LOGIC ---
     const handleSaveClient = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await addDoc(collection(db, "clientes"), { ...clientData, fechaRegistro: Date.now() });
+            await addDoc(collection(db, "clientes"), { ...clientData, fechaRegistro: Date.now(), userId: user?.uid });
             setClientData({ nombre: '', tipo: 'B2B', email: '', telefono: '', direccion: '', fechaRegistro: Date.now() });
             setShowClientForm(false);
         } catch (error) {
@@ -126,7 +137,7 @@ export default function ClientesPage() {
                 alert("Añade al menos un producto al pedido.");
                 return;
             }
-            await addDoc(collection(db, "pedidosVenta"), { ...orderData, fechaCreacion: Date.now() });
+            await addDoc(collection(db, "pedidosVenta"), { ...orderData, fechaCreacion: Date.now(), userId: user?.uid });
             setOrderData({ clienteId: '', clienteNombre: '', items: [], total: 0, estado: 'pendiente', fechaCreacion: Date.now() });
             setShowOrderForm(false);
         } catch (error) {

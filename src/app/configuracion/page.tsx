@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { Building2, User, Save, Shield, Bell } from "lucide-react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 import { BusinessSettings, UserSettings } from "@/types/settings";
 
 export default function ConfiguracionPage() {
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'negocio' | 'perfil'>('negocio');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -31,9 +33,13 @@ export default function ConfiguracionPage() {
 
     useEffect(() => {
         const fetchSettings = async () => {
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+
             try {
-                // In a real app, this would be scoped to the tenant/user ID
-                const docRef = doc(db, "settings", "global");
+                const docRef = doc(db, "settings", user.uid);
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -49,7 +55,7 @@ export default function ConfiguracionPage() {
         };
 
         fetchSettings();
-    }, []);
+    }, [user]);
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,7 +63,8 @@ export default function ConfiguracionPage() {
         setSaveMessage({ text: '', type: '' });
 
         try {
-            const docRef = doc(db, "settings", "global");
+            if (!user) return;
+            const docRef = doc(db, "settings", user.uid);
             await setDoc(docRef, {
                 business: businessData,
                 user: userData,
@@ -132,7 +139,7 @@ export default function ConfiguracionPage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Razón Social</label>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Nombre de la Panadería</label>
                                         <input type="text" value={businessData.razonSocial} onChange={e => setBusinessData({ ...businessData, razonSocial: e.target.value })} className="mt-1 block w-full rounded-md border text-slate-900 border-slate-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm" placeholder="Panadería Europea S.L." />
                                     </div>
                                     <div>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, query, getDocs, writeBatch, doc } from "firebase/firestore";
+import { collection, onSnapshot, query, where, getDocs, writeBatch, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 import {
   TrendingUp, Package, Clock, AlertTriangle,
   ShoppingCart, CheckCircle, ChefHat, ArrowRight
@@ -15,6 +16,7 @@ import { ProductionOrder } from "@/types/production";
 import { Ingredient } from "@/types/inventory";
 
 export default function Home() {
+  const { user } = useAuth();
   // KPI Data
   const [ingresosMes, setIngresosMes] = useState(0);
   const [pedidosPendientes, setPedidosPendientes] = useState(0);
@@ -28,8 +30,14 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     // 1. Ingresos y Gráfico
-    const unsubscribeFacturas = onSnapshot(collection(db, "facturas"), (snapshot) => {
+    const qFacturas = query(collection(db, "facturas"), where("userId", "==", user.uid));
+    const unsubscribeFacturas = onSnapshot(qFacturas, (snapshot) => {
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
@@ -78,7 +86,8 @@ export default function Home() {
     });
 
     // 2. Pedidos Pendientes & Últimos Pedidos
-    const unsubscribePedidos = onSnapshot(collection(db, "pedidosVenta"), (snapshot) => {
+    const qPedidos = query(collection(db, "pedidosVenta"), where("userId", "==", user.uid));
+    const unsubscribePedidos = onSnapshot(qPedidos, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as SaleOrder[];
 
       // Pending count
@@ -91,14 +100,16 @@ export default function Home() {
     });
 
     // 3. Órdenes de Producción Activas
-    const unsubscribeProduccion = onSnapshot(collection(db, "ordenesProduccion"), (snapshot) => {
+    const qProduccion = query(collection(db, "ordenesProduccion"), where("userId", "==", user.uid));
+    const unsubscribeProduccion = onSnapshot(qProduccion, (snapshot) => {
       const data = snapshot.docs.map(doc => doc.data() as ProductionOrder);
       const enProcesoCount = data.filter(o => o.estado === 'pendiente' || o.estado === 'enProceso').length;
       setOrdenesEnProceso(enProcesoCount);
     });
 
     // 4. Inventario - Alertas de Stock
-    const unsubscribeInventario = onSnapshot(collection(db, "ingredientes"), (snapshot) => {
+    const qInventario = query(collection(db, "ingredientes"), where("userId", "==", user.uid));
+    const unsubscribeInventario = onSnapshot(qInventario, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Ingredient[];
       const kriticos = data.filter(ing => ing.stockActual <= ing.stockMinimo);
       kriticos.sort((a, b) => (a.stockActual / a.stockMinimo) - (b.stockActual / b.stockMinimo));
@@ -113,7 +124,7 @@ export default function Home() {
       unsubscribeProduccion();
       unsubscribeInventario();
     };
-  }, []);
+  }, [user]);
 
   const handleSeedData = async () => {
     if (!confirm("⚠️ ¿Estás seguro de que quieres BORRAR TODOS LOS DATOS (Ingredientes, Clientes, Recetas) preexistentes y generar el Demo realista?")) return;
@@ -122,10 +133,11 @@ export default function Home() {
     try {
       const batch = writeBatch(db);
 
-      // 1. Borrar colecciones actuales
-      const colsToClear = ["ingredientes", "clientes", "recetas"];
+      // 1. Borrar colecciones actuales del usuario
+      const colsToClear = ["ingredientes", "clientes", "recetas", "ordenesProduccion", "pedidosVenta", "facturas"];
       for (const colName of colsToClear) {
-        const snapshot = await getDocs(collection(db, colName));
+        const q = query(collection(db, colName), where("userId", "==", user?.uid));
+        const snapshot = await getDocs(q);
         snapshot.docs.forEach(d => {
           batch.delete(doc(db, colName, d.id));
         });
@@ -133,12 +145,12 @@ export default function Home() {
 
       // 2. Poblar Ingredientes (6)
       const demoIngredientes = [
-        { nombre: "Harina de Fuerza T80", SKU: "HAR-001", categoria: "Harinas", stockActual: 120, stockMinimo: 50, unidad: "kg", estado: "ok", ultimaAct: Date.now() },
-        { nombre: "Levadura Fresca", SKU: "LEV-001", categoria: "Levaduras", stockActual: 2, stockMinimo: 5, unidad: "kg", estado: "bajo", ultimaAct: Date.now() },
-        { nombre: "Mantequilla Extra 82%", SKU: "MAN-001", categoria: "Lácteos", stockActual: 15, stockMinimo: 20, unidad: "kg", estado: "bajo", ultimaAct: Date.now() },
-        { nombre: "Sal Fina", SKU: "SAL-001", categoria: "Otros", stockActual: 25, stockMinimo: 10, unidad: "kg", estado: "ok", ultimaAct: Date.now() },
-        { nombre: "Azúcar Blanco", SKU: "AZU-001", categoria: "Otros", stockActual: 40, stockMinimo: 15, unidad: "kg", estado: "ok", ultimaAct: Date.now() },
-        { nombre: "Chips de Chocolate 54%", SKU: "CHO-001", categoria: "Chocolates", stockActual: 8, stockMinimo: 10, unidad: "kg", estado: "bajo", ultimaAct: Date.now() }
+        { nombre: "Harina de Fuerza T80", SKU: "HAR-001", categoria: "Harinas", stockActual: 120, stockMinimo: 50, unidad: "kg", estado: "ok", ultimaAct: Date.now(), userId: user?.uid },
+        { nombre: "Levadura Fresca", SKU: "LEV-001", categoria: "Levaduras", stockActual: 2, stockMinimo: 5, unidad: "kg", estado: "bajo", ultimaAct: Date.now(), userId: user?.uid },
+        { nombre: "Mantequilla Extra 82%", SKU: "MAN-001", categoria: "Lácteos", stockActual: 15, stockMinimo: 20, unidad: "kg", estado: "bajo", ultimaAct: Date.now(), userId: user?.uid },
+        { nombre: "Sal Fina", SKU: "SAL-001", categoria: "Otros", stockActual: 25, stockMinimo: 10, unidad: "kg", estado: "ok", ultimaAct: Date.now(), userId: user?.uid },
+        { nombre: "Azúcar Blanco", SKU: "AZU-001", categoria: "Otros", stockActual: 40, stockMinimo: 15, unidad: "kg", estado: "ok", ultimaAct: Date.now(), userId: user?.uid },
+        { nombre: "Chips de Chocolate 54%", SKU: "CHO-001", categoria: "Chocolates", stockActual: 8, stockMinimo: 10, unidad: "kg", estado: "bajo", ultimaAct: Date.now(), userId: user?.uid }
       ];
 
       const ingRefs = demoIngredientes.map(ing => {
@@ -149,9 +161,9 @@ export default function Home() {
 
       // 3. Poblar Clientes (3)
       const demoClientes = [
-        { nombre: "Cafetería Central", tipo: "B2B", email: "pedidos@cafecentral.com", telefono: "600123456", direccion: "Gran Vía 12", ultimaAct: Date.now() },
-        { nombre: "Hotel Miramar*****", tipo: "B2B", email: "cocina@miramar.com", telefono: "611987654", direccion: "Paseo Marítimo 1", ultimaAct: Date.now() },
-        { nombre: "Restaurante El Puerto", tipo: "B2B", email: "info@elpuerto.es", telefono: "622334455", direccion: "Muelle 4", ultimaAct: Date.now() }
+        { nombre: "Cafetería Central", tipo: "B2B", email: "pedidos@cafecentral.com", telefono: "600123456", direccion: "Gran Vía 12", ultimaAct: Date.now(), userId: user?.uid },
+        { nombre: "Hotel Miramar*****", tipo: "B2B", email: "cocina@miramar.com", telefono: "611987654", direccion: "Paseo Marítimo 1", ultimaAct: Date.now(), userId: user?.uid },
+        { nombre: "Restaurante El Puerto", tipo: "B2B", email: "info@elpuerto.es", telefono: "622334455", direccion: "Muelle 4", ultimaAct: Date.now(), userId: user?.uid }
       ];
       demoClientes.forEach(cli => {
         const ref = doc(collection(db, "clientes"));
@@ -161,7 +173,7 @@ export default function Home() {
       // 4. Poblar Recetas (3)
       const demoRecetas = [
         {
-          nombre: "Barra Rústica", mermasPermitidas: 2, ultimaAct: Date.now(),
+          nombre: "Barra Rústica", mermasPermitidas: 2, ultimaAct: Date.now(), userId: user?.uid,
           ingredientes: [
             { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.25, unidad: ingRefs[0].unidad },
             { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.005, unidad: ingRefs[1].unidad },
@@ -169,7 +181,7 @@ export default function Home() {
           ]
         },
         {
-          nombre: "Croissant de Mantequilla", mermasPermitidas: 5, ultimaAct: Date.now(),
+          nombre: "Croissant de Mantequilla", mermasPermitidas: 5, ultimaAct: Date.now(), userId: user?.uid,
           ingredientes: [
             { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.05, unidad: ingRefs[0].unidad },
             { ingredienteId: ingRefs[1].id, nombre: ingRefs[1].nombre, cantidad: 0.002, unidad: ingRefs[1].unidad },
@@ -178,7 +190,7 @@ export default function Home() {
           ]
         },
         {
-          nombre: "Napolitana de Chocolate", mermasPermitidas: 5, ultimaAct: Date.now(),
+          nombre: "Napolitana de Chocolate", mermasPermitidas: 5, ultimaAct: Date.now(), userId: user?.uid,
           ingredientes: [
             { ingredienteId: ingRefs[0].id, nombre: ingRefs[0].nombre, cantidad: 0.05, unidad: ingRefs[0].unidad },
             { ingredienteId: ingRefs[2].id, nombre: ingRefs[2].nombre, cantidad: 0.025, unidad: ingRefs[2].unidad },
@@ -303,7 +315,7 @@ export default function Home() {
                 Ver todos <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="flex-1 p-0">
+            <div className="flex-1 p-0 overflow-x-auto">
               {ultimosPedidos.length === 0 ? (
                 <div className="p-8 text-center text-slate-500 text-sm">No hay pedidos recientes en la base de datos.</div>
               ) : (

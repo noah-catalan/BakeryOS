@@ -17,8 +17,7 @@ export const metadata: Metadata = {
   description: "Sistema integral de gestión para panaderías y cafeterías",
 };
 
-import Sidebar from "@/components/layout/Sidebar";
-import Topbar from "@/components/layout/Topbar";
+import ClientLayout from "@/components/layout/ClientLayout";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthGuard from "@/components/auth/AuthGuard";
 
@@ -34,15 +33,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <AuthGuard>
-            <div className="flex h-screen overflow-hidden bg-slate-50">
-              <Sidebar />
-              <div className="flex flex-1 flex-col overflow-hidden">
-                <Topbar />
-                <main className="flex-1 overflow-y-auto w-full">
-                  {children}
-                </main>
-              </div>
-            </div>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
           </AuthGuard>
         </AuthProvider>
       </body>
