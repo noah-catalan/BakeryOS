@@ -147,7 +147,7 @@ export default function Home() {
                 <Tooltip
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ fontSize: '13px', fontWeight: 500 }}
-                  formatter={(value: number) => [`${value}€`]}
+                  formatter={(value: any) => [`${value}€`]}
                 />
                 <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorVentas)" />
                 <Area type="monotone" dataKey="costes" name="Costes" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorCostes)" />
