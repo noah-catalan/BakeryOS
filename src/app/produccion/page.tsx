@@ -5,11 +5,13 @@ import { BookOpen, CalendarClock, Plus, List, Scale, Clock, Trash2, CheckCircle,
 import { addDoc, collection, deleteDoc, doc, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Recipe, RecipeIngredient, ProductionOrder } from "@/types/production";
 import { useRecipes, useProductionOrders, useIngredients } from "@/hooks/useFirebaseData";
 
 export default function ProduccionPage() {
     const { user } = useAuth();
+    const toast = useToast();
     const [activeTab, setActiveTab] = useState<'recetas' | 'ordenes'>('recetas');
 
     // Hooks
@@ -80,13 +82,14 @@ export default function ProduccionPage() {
             } else {
                 await addDoc(collection(db, "recetas"), { ...recipeData, userId: user?.uid });
             }
+            toast.success(editingRecipeId ? "Receta modificada correctamente." : "Receta creada correctamente.");
             // Reset
             setEditingRecipeId(null);
             setRecipeData({ nombre: '', ingredientes_necesarios: [], rendimiento: 1, tiempoEstimado: 60, costeProduccion: 0 });
             setShowRecipeForm(false);
         } catch (error) {
             console.error("Error creating/updating recipe:", error);
-            alert("Error al guardar la receta.");
+            toast.error("Error al guardar la receta.");
         }
     };
 
@@ -105,7 +108,12 @@ export default function ProduccionPage() {
 
     const handleDeleteRecipe = async (id: string) => {
         if (confirm("¿Eliminar este escandallo?")) {
-            await deleteDoc(doc(db, "recetas", id));
+            try {
+                await deleteDoc(doc(db, "recetas", id));
+                toast.success("Receta eliminada correctamente.");
+            } catch (error) {
+                toast.error("Hubo un error al eliminar la receta.");
+            }
         }
     };
 
@@ -126,10 +134,11 @@ export default function ProduccionPage() {
         try {
             const newOrder = { ...orderData, fechaCreacion: Date.now(), userId: user?.uid };
             await addDoc(collection(db, "ordenesProduccion"), newOrder);
+            toast.success("Orden de producción planificada.");
             setShowOrderForm(false);
         } catch (error) {
             console.error("Error creating order:", error);
-            alert("Error al guardar la orden.");
+            toast.error("Error al guardar la orden.");
         }
     };
 
@@ -178,17 +187,22 @@ export default function ProduccionPage() {
 
             // Commit transaction
             await batch.commit();
-            alert("¡Orden completada e inventario actualizado!");
+            toast.success("¡Orden completada e inventario actualizado!");
 
         } catch (error) {
             console.error("Error completing order:", error);
-            alert("Error al procesar la orden y deducir inventario.");
+            toast.error("Error al procesar la orden y deducir inventario.");
         }
     };
 
     const handleDeleteOrder = async (id: string) => {
         if (confirm("¿Eliminar esta orden?")) {
-            await deleteDoc(doc(db, "ordenesProduccion", id));
+            try {
+                await deleteDoc(doc(db, "ordenesProduccion", id));
+                toast.success("Orden de producción eliminada.");
+            } catch (error) {
+                toast.error("Error al eliminar la orden.");
+            }
         }
     };
 

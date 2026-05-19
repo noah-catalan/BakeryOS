@@ -5,12 +5,14 @@ import { FileText, Plus, CheckCircle, Clock, Trash2, Download, AlertCircle, Prin
 import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Invoice } from "@/types/billing";
 import { Client, SaleOrder, SaleOrderItem } from "@/types/clients";
 import { useSettings } from "@/hooks/useFirebaseData";
 
 export default function FacturacionPage() {
     const { user } = useAuth();
+    const toast = useToast();
     const [activeTab, setActiveTab] = useState<'historial' | 'nueva'>('historial');
 
     // Data State
@@ -144,7 +146,7 @@ export default function FacturacionPage() {
         e.preventDefault();
         try {
             if (invoiceData.items.length === 0) {
-                alert("La factura debe tener al menos un ítem.");
+                toast.warning("La factura debe tener al menos un ítem.");
                 return;
             }
 
@@ -165,16 +167,21 @@ export default function FacturacionPage() {
                 estado: 'borrador', fechaEmision: Date.now(), fechaVencimiento: Date.now() + (30 * 24 * 60 * 60 * 1000), pedidoOrigenId: ''
             });
             setActiveTab('historial');
-            alert(`Factura ${numFac} guardada exitosamente.`);
+            toast.success(`Factura ${numFac} guardada exitosamente.`);
         } catch (error) {
             console.error("Error creating invoice:", error);
-            alert("Error al guardar la factura.");
+            toast.error("Error al guardar la factura.");
         }
     };
 
     const handleMarkAsPaid = async (id: string) => {
         if (confirm("¿Marcar esta factura como PAGADA?")) {
-            await updateDoc(doc(db, "facturas", id), { estado: 'pagada' });
+            try {
+                await updateDoc(doc(db, "facturas", id), { estado: 'pagada' });
+                toast.success("Factura cobrada correctamente.");
+            } catch (error) {
+                toast.error("Error al cobrar la factura.");
+            }
         }
     };
 

@@ -5,10 +5,12 @@ import { Users, ShoppingBag, Plus, Building2, User, Phone, Mail, MapPin, Trash2,
 import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Client, SaleOrder, SaleOrderItem } from "@/types/clients";
 
 export default function ClientesPage() {
     const { user } = useAuth();
+    const toast = useToast();
     const [activeTab, setActiveTab] = useState<'directorio' | 'pedidos'>('directorio');
 
     // Data State
@@ -95,13 +97,14 @@ export default function ClientesPage() {
             } else {
                 await addDoc(collection(db, "clientes"), { ...sanitizedData, fechaRegistro: Date.now(), userId: user?.uid });
             }
+            toast.success(editingClientId ? "Cliente actualizado correctamente." : "Cliente guardado correctamente.");
             // Reset
             setEditingClientId(null);
             setClientData({ nombre: '', tipo: 'B2B', email: '', telefono: '', direccion: '', fechaRegistro: Date.now() });
             setShowClientForm(false);
         } catch (error) {
             console.error("Error completo al guardar el cliente:", error);
-            alert("Error al guardar el cliente.");
+            toast.error("Error al guardar el cliente.");
         }
     };
 
@@ -121,7 +124,12 @@ export default function ClientesPage() {
 
     const handleDeleteClient = async (id: string) => {
         if (confirm("¿Eliminar este cliente del directorio?")) {
-            await deleteDoc(doc(db, "clientes", id));
+            try {
+                await deleteDoc(doc(db, "clientes", id));
+                toast.success("Cliente eliminado correctamente.");
+            } catch (error) {
+                toast.error("Error al eliminar el cliente.");
+            }
         }
     };
 
@@ -160,15 +168,16 @@ export default function ClientesPage() {
         e.preventDefault();
         try {
             if (orderData.items.length === 0) {
-                alert("Añade al menos un producto al pedido.");
+                toast.warning("Añade al menos un producto al pedido.");
                 return;
             }
             await addDoc(collection(db, "pedidosVenta"), { ...orderData, fechaCreacion: Date.now(), userId: user?.uid });
+            toast.success("Pedido guardado correctamente.");
             setOrderData({ clienteId: '', clienteNombre: '', items: [], total: 0, estado: 'pendiente', fechaCreacion: Date.now() });
             setShowOrderForm(false);
         } catch (error) {
             console.error("Error creating order:", error);
-            alert("Error al guardar el pedido.");
+            toast.error("Error al guardar el pedido.");
         }
     };
 

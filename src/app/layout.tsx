@@ -39,6 +39,7 @@ export const metadata: Metadata = {
 
 import ClientLayout from "@/components/layout/ClientLayout";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
 import AuthGuard from "@/components/auth/AuthGuard";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
@@ -54,11 +55,13 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            <AuthGuard>
-              <ClientLayout>
-                {children}
-              </ClientLayout>
-            </AuthGuard>
+            <ToastProvider>
+              <AuthGuard>
+                <ClientLayout>
+                  {children}
+                </ClientLayout>
+              </AuthGuard>
+            </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

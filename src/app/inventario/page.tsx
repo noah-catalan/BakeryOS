@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { Ingredient } from "@/types/inventory";
 import { Trash2, Plus, Pencil, Package, X } from "lucide-react";
 
 export default function InventarioPage() {
     const { user } = useAuth();
+    const toast = useToast();
     const [ingredientes, setIngredientes] = useState<Ingredient[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -78,12 +80,13 @@ export default function InventarioPage() {
                 await addDoc(collection(db, "ingredientes"), sanitizedData);
             }
 
+            toast.success(editingIngId ? "Ingrediente actualizado correctamente." : "Ingrediente guardado correctamente.");
             setEditingIngId(null);
             setFormData({ nombre: "", SKU: "", categoria: "Harinas", stockActual: 0, stockMinimo: 0, estado: "ok" });
             setShowForm(false);
         } catch (error) {
             console.error("Error saving ingredient: ", error);
-            alert("Hubo un error al guardar el ingrediente.");
+            toast.error("Hubo un error al guardar el ingrediente.");
         }
     };
 
@@ -104,9 +107,10 @@ export default function InventarioPage() {
         if (confirm("¿Estás seguro de que deseas eliminar este ingrediente?")) {
             try {
                 await deleteDoc(doc(db, "ingredientes", id));
+                toast.success("Ingrediente eliminado correctamente.");
             } catch (error) {
                 console.error("Error deleting document: ", error);
-                alert("Hubo un error al eliminar el ingrediente.");
+                toast.error("Hubo un error al eliminar el ingrediente.");
             }
         }
     };

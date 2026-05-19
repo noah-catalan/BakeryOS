@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BakeryOS: un ERP para la gestión de panaderías - Memoria Técnica TFG</title>
+  <style>
+    /* ==========================================
+       1. CONFIGURACIÓN DE PÁGINA E IMPRESIÓN A4
+       ========================================== */
+    @page {
+      size: A4;
+      margin: 22mm 20mm 22mm 20mm; /* Márgenes académicos premium */
+      
+      /* Pie de página izquierdo: Autoría y Título */
+      @bottom-left {
+        content: "BakeryOS: ERP para Panaderías | Autor: Noah Catalán Rosell";
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+        color: #555555;
+        border-top: 0.5px solid #cccccc;
+        padding-top: 3mm;
+        width: 100%;
+      }
+      
+      /* Pie de página derecho: Numeración Dinámica */
+      @bottom-right {
+        content: "Página " counter(page) " de " counter(pages);
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+        color: #555555;
+        border-top: 0.5px solid #cccccc;
+        padding-top: 3mm;
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: #222222;
+      line-height: 1.6;
+      font-size: 11pt;
+      background-color: #ffffff;
+    }
+    
+    /* ==========================================
+       2. ESTRUCTURA DE LA PORTADA
+       ========================================== */
+    .cover-page {
+      height: 250mm; /* Ajustada al formato A4 */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      padding-top: 10mm;
+      padding-bottom: 10mm;
+    }
+    
+    .cover-header {
+      border-bottom: 2.5px solid #111111;
+      padding-bottom: 6mm;
+    }
+    
+    .institution-name {
+      font-size: 11pt;
+      color: #333333;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: bold;
+    }
+    
+    .department-name {
+      font-size: 9pt;
+      margin-top: 2mm;
+      color: #666666;
+      font-weight: normal;
+    }
+    
+    .cover-title-container {
+      margin-top: 35mm;
+      margin-bottom: 35mm;
+    }
+    
+    .cover-title {
+      font-size: 28pt;
+      font-weight: bold;
+      line-height: 1.25;
+      color: #111111;
+      margin-bottom: 8mm;
+    }
+    
+    .cover-subtitle {
+      font-size: 14pt;
+      color: #444444;
+      margin-bottom: 10mm;
+      line-height: 1.5;
+    }
+    
+    .cover-footer {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 8mm;
+      font-size: 11pt;
+    }
+    
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 8mm;
+    }
+    
+    .metadata-block {
+      margin-bottom: 4mm;
+    }
+    
+    .metadata-label {
+      font-weight: bold;
+      color: #555555;
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .metadata-value {
+      font-size: 11pt;
+      color: #111111;
+      margin-top: 1mm;
+    }
+    
+    /* ==========================================
+       3. ESTRUCTURA DEL ÍNDICE (TOC)
+       ========================================== */
+    .index-page {
+      page-break-after: always;
+      padding-top: 10mm;
+    }
+    
+    .section-title {
+      font-size: 18pt;
+      font-weight: bold;
+      border-bottom: 1.5px solid #111111;
+      padding-bottom: 4mm;
+      margin-bottom: 10mm;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .index-list {
+      margin-top: 8mm;
+    }
+    
+    .index-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 5.5mm;
+      font-size: 11pt;
+    }
+    
+    .index-name {
+      background-color: #ffffff;
+      padding-right: 6px;
+      color: #111111;
+    }
+    
+    .index-dots {
+      flex: 1;
+      border-bottom: 1px dotted #777777;
+      margin: 0 6px 4px 6px;
+    }
+    
+    .index-number {
+      font-weight: bold;
+      background-color: #ffffff;
+      padding-left: 6px;
+      color: #111111;
+    }
+    
+    /* ==========================================
+       4. ESTILOS DE CONTENIDO Y TIPOGRAFÍA
+       ========================================== */
+    .content-section {
+      page-break-after: always;
+      padding-top: 8mm;
+    }
+    
+    h1 {
+      font-size: 16pt;
+      font-weight: bold;
+      color: #111111;
+      margin-top: 0;
+      margin-bottom: 6mm;
+      border-bottom: 1px solid #333333;
+      padding-bottom: 3mm;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    h2 {
+      font-size: 13pt;
+      font-weight: bold;
+      color: #222222;
+      margin-top: 8mm;
+      margin-bottom: 4mm;
+      border-left: 4px solid #4a5568;
+      padding-left: 10px;
+    }
+    
+    h3 {
+      font-size: 11.5pt;
+      font-weight: bold;
+      color: #2d3748;
+      margin-top: 6mm;
+      margin-bottom: 3mm;
+    }
+    
+    p {
+      margin-top: 0;
+      margin-bottom: 5mm;
+      text-align: justify;
+      color: #2d3748;
+      text-justify: inter-word;
+    }
+    
+    ul, ol {
+      margin-top: 0;
+      margin-bottom: 5mm;
+      padding-left: 6mm;
+    }
+    
+    li {
+      margin-bottom: 2mm;
+      color: #2d3748;
+      text-align: justify;
+    }
+    
+    /* ==========================================
+       5. COMPONENTES ESPECIALES
+       ========================================== */
+    .table-container {
+      margin-top: 6mm;
+      margin-bottom: 6mm;
+      page-break-inside: avoid;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+      margin-bottom: 4mm;
+    }
+    
+    th {
+      background-color: #f7fafc;
+      color: #2d3748;
+      font-weight: bold;
+      border-bottom: 2px solid #e2e8f0;
+      text-align: left;
+      padding: 8px 12px;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+      letter-spacing: 0.5px;
+    }
+    
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4a5568;
+      vertical-align: top;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #fcfcfc;
+    }
+    
+    /* Bloque simulador de terminal de consola */
+    .console-box {
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 8.5pt;
+      padding: 14px 18px;
+      border-radius: 6px;
+      border: 1px solid #2d2d2d;
+      margin-top: 4mm;
+      margin-bottom: 6mm;
+      white-space: pre-wrap;
+      word-break: break-all;
+      page-break-inside: avoid;
+      line-height: 1.4;
+    }
+    
+    .console-prompt {
+      color: #4ec9b0;
+      font-weight: bold;
+    }
+    
+    .console-command {
+      color: #ce9178;
+      font-weight: bold;
+    }
+    
+    .console-output {
+      color: #b5cea8;
+      display: block;
+      margin-top: 5px;
+    }
+    
+    /* Bloque de código de programación */
+    .code-box {
+      background-color: #f8f9fa;
+      border: 1px solid #e2e8f0;
+      color: #2d3748;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 8.5pt;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-top: 4mm;
+      margin-bottom: 6mm;
+      white-space: pre;
+      page-break-inside: avoid;
+      line-height: 1.4;
+      border-left: 4px solid #3182ce;
+    }
+
+    .info-callout {
+      background-color: #ebf8ff;
+      border-left: 4px solid #3182ce;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin-top: 4mm;
+      margin-bottom: 6mm;
+      page-break-inside: avoid;
+    }
+
+    .info-callout p {
+      margin: 0;
+      color: #2b6cb0;
+      font-size: 9.5pt;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+     PORTADA ACADÉMICA
+     ========================================== -->
+  <div class="cover-page">
+    <div class="cover-header">
+      <div class="institution-name">CIFP Francesc de Borja Moll</div>
+      <div class="department-name">Departamento de Informática | Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web</div>
+    </div>
+    
+    <div class="cover-title-container">
+      <div class="cover-title">BakeryOS: un ERP para la gestión de panaderías</div>
+      <div class="cover-subtitle">Diseño, arquitectura y desarrollo de un ecosistema digital avanzado en la nube para la optimización de procesos de producción, stock, facturación y control por lenguaje natural en panaderías artesanales</div>
+    </div>
+    
+    <div class="cover-footer">
+      <div class="metadata-grid">
+        <div class="metadata-block">
+          <div class="metadata-label">Autor:</div>
+          <div class="metadata-value">Noah Catalán Rosell</div>
+        </div>
+        <div class="metadata-block">
+          <div class="metadata-label">Tutor del Proyecto:</div>
+          <div class="metadata-value">Miquel Antoni Capellà Arrom</div>
+        </div>
+        <div class="metadata-block">
+          <div class="metadata-label">Entorno / Despliegue:</div>
+          <div class="metadata-value">Vercel & Google Firebase Cloud</div>
+        </div>
+        <div class="metadata-block">
+          <div class="metadata-label">Fecha de Presentación:</div>
+          <div class="metadata-value">Junio 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+     ÍNDICE DE CONTENIVOS
+     ========================================== -->
+  <div class="index-page">
+    <div class="section-title">Índice de Secciones</div>
+    <div class="index-list">
+      <div class="index-item">
+        <span class="index-name">1. Introducción y Contexto</span>
+        <span class="index-dots"></span>
+        <span class="index-number">3</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">2. Impacto y Aspectos Éticos</span>
+        <span class="index-dots"></span>
+        <span class="index-number">4</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">3. Metodología y Herramientas</span>
+        <span class="index-dots"></span>
+        <span class="index-number">5</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">4. Planificación del Proyecto</span>
+        <span class="index-dots"></span>
+        <span class="index-number">6</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">5. Alcance y Funcionalidades del Sistema</span>
+        <span class="index-dots"></span>
+        <span class="index-number">7</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">6. Entorno de Trabajo y Prototipado</span>
+        <span class="index-dots"></span>
+        <span class="index-number">8</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">7. Desarrollo de Sprints 1 y 2</span>
+        <span class="index-dots"></span>
+        <span class="index-number">9</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">8. Desarrollo de Sprint 3: Arquitectura y Producción Automatizada</span>
+        <span class="index-dots"></span>
+        <span class="index-number">10</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">9. Desarrollo de Sprint 4: BakeryAI NLP y Sistema de Notificaciones</span>
+        <span class="index-dots"></span>
+        <span class="index-number">12</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">10. Conclusiones y Trabajo Futuro</span>
+        <span class="index-dots"></span>
+        <span class="index-number">14</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 1: INTRODUCCIÓN Y CONTEXTO
+     ========================================== -->
+  <div class="content-section">
+    <h1>1. Introducción y Contexto</h1>
+    <h2>1.1. Problemática y Oportunidad</h2>
+    <p>
+      La inspiración para este proyecto nace de la observación directa y la experiencia personal. Como cliente habitual durante años de la panadería de mi barrio, he podido constatar las graves dificultades operativas a las que se enfrentan diariamente. A pesar de ofrecer un producto artesanal de altísima calidad, muchos de estos pequeños negocios todavía dependen hoy en día de métodos de gestión completamente manuales, tales como libretas de papel, pizarras de tiza y hojas de cálculo locales dispersas para procesos que resultan críticos para la viabilidad económica del negocio.
+    </p>
+    <p>
+      Esta dependencia de métodos anticuados genera ineficiencias sustanciales que restringen su rentabilidad y limitan su potencial de crecimiento en un mercado cada vez más competitivo. La problemática principal del sector se sintetiza en tres vertientes fundamentales:
+    </p>
+    <ul>
+      <li><strong>Control de inventario y desperdicio de producción:</strong> La falta de un sistema centralizado y digital de gestión permite que se produzcan mermas constantes debido a excesos de producción o a compras desorganizadas que no se corresponden con las necesidades reales de stock diario.</li>
+      <li><strong>Cálculo inexacto de costes:</strong> Sin una herramienta capaz de calcular el coste de las recetas (escandallo) de manera automática basada en el precio actualizado de compra de los ingredientes, resulta extremadamente complejo para los panaderos conocer el coste real de cada producto y fijar un precio de venta estratégico que garantice un margen de beneficio constante.</li>
+      <li><strong>Gestión administrativa y de pedidos recurrentes:</strong> Tareas como el seguimiento de pedidos para clientes de hostelería habituales o la emisión de facturas mensuales representan un proceso de administración tedioso y altamente propenso a errores humanos que restan valioso tiempo a la labor artesanal de panificación.</li>
+    </ul>
+    <p>
+      Ante este escenario, se detectó una oportunidad clara para conceptualizar y desarrollar un software de tipo ERP (Enterprise Resource Planning) extremadamente intuitivo, centrado en la facilidad de uso y diseñado específicamente para eliminar la barrera tecnológica en pequeños negocios artesanales de panadería.
+    </p>
+    
+    <h2>1.2. Objetivos del Proyecto</h2>
+    <p>
+      El objetivo principal de BakeryOS es desarrollar una aplicación web funcional, robusta y accesible que permita a las panaderías artesanales digitalizar de forma integral y centralizada la gestión de su inventario, planificación de producción, gestión de recetas y relación de pedidos y facturación con clientes B2B/B2C.
+    </p>
+    <p>
+      Para lograrlo, se han trazado los siguientes objetivos específicos:
+    </p>
+    <ul>
+      <li><strong>Implementar un módulo de inventario integral:</strong> Diseñar y maquetar una interfaz ágil de control de materias primas y productos elaborados, con estados visuales semafóricos ("ok", "bajo", "alerta") e históricos dinámicos sincronizados en tiempo real.</li>
+      <li><strong>Crear un sistema de recetas (escandallos) y planificación de producción:</strong> Desarrollar la lógica de base de datos que relacione los ingredientes con los productos terminados, determinando de forma automática el coste total de producción y permitiendo generar órdenes diarias de horneado.</li>
+      <li><strong>Desarrollar un módulo transaccional de clientes y pedidos:</strong> Dotar a la aplicación de un registro de clientes B2B (cafeterías, restaurantes) y un motor de planificación que permita configurar pedidos recurrentes diarios, automatizando el flujo administrativo tradicional.</li>
+      <li><strong>Diseñar una interfaz de usuario minimalista y responsiva:</strong> Aplicar principios avanzados de Experiencia de Usuario (UX) a través de un diseño visual limpio, elegante y adaptable a dispositivos móviles y tabletas utilizados a pie de obrador.</li>
+      <li><strong>Diseñar e implementar una interfaz de control por lenguaje natural (BakeryAI):</strong> Crear un módulo innovador que permita a los operarios interactuar con el ERP a través de voz y comandos textuales naturales en español (ej. <em>"añadir 20 a Harina de Fuerza T80"</em>), facilitando el trabajo con las manos ocupadas en la masa.</li>
+    </ul>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 2: IMPACTO Y ASPECTOS ÉTICOS
+     ========================================== -->
+  <div class="content-section">
+    <h1>2. Impacto y Aspectos Éticos</h1>
+    <h2>2.1. Sostenibilidad y Accesibilidad</h2>
+    <p>
+      <strong>Sostenibilidad Ambiental:</strong> BakeryOS aporta un impacto ecológico sumamente positivo al obrador. Al digitalizar por completo el flujo de albaranes, pedidos y la facturación, se reduce prácticamente a cero el consumo de papel físico utilizado habitualmente en las comandas diarias. Asimismo, al planificar con exactitud la producción basada en los pedidos consolidados del día y el stock real de ingredientes, se reduce de manera directa el desperdicio alimentario, lo que se alinea estrechamente con el Objetivo de Desarrollo Sostenible (ODS) 12 de la Agenda 2030 de la ONU.
+    </p>
+    <p>
+      <strong>Accesibilidad Universal:</strong> Conscientes de que el personal del obrador no posee un perfil tecnológico avanzado y realiza sus labores bajo condiciones de trabajo físicamente exigentes, la accesibilidad es un factor central de BakeryOS. La interfaz utiliza HTML semántico, contrastes cromáticos de color de nivel AAA y fuentes tipográficas limpias que evitan la fatiga visual. La incorporación del asistente de voz BakeryAI supone un salto radical en materia de accesibilidad al permitir que personas con limitaciones de motricidad fina o manos sucias puedan dictar y ejecutar tareas sin necesidad de tocar la pantalla táctil de una tableta.
+    </p>
+    
+    <h2>2.2. Usabilidad y Diversidad</h2>
+    <p>
+      La aplicación ha sido concebida bajo la máxima de "el software debe adaptarse al usuario y no al revés". En lugar de estructurar un ERP saturado de campos numéricos y menús infinitos, la interfaz presenta tableros limpios donde la información clave resalta gracias al uso de micro-animaciones no intrusivas y colores de significado unívoco (rojo para urgencias de stock, azul para procesos activos, verde para tareas completadas). La usabilidad ha sido corroborada mediante pruebas empíricas imitando las dinámicas reales de una panadería típica, optimizando de esta manera los flujos de clics a su mínima expresión.
+    </p>
+    
+    <h2>2.3. Protección de Datos y Licenciamiento</h2>
+    <p>
+      El sistema gestiona datos sensibles correspondientes a cuentas de clientes B2B, cifras de facturación, direcciones de correo y números telefónicos. De acuerdo con el Reglamento General de Protección de Datos (RGPD), se han adoptado las siguientes medidas técnicas de seguridad en el entorno de la nube de Google Firebase:
+    </p>
+    <ul>
+      <li><strong>Autenticación robusta:</strong> La gestión de accesos se realiza a través de Firebase Authentication, delegando en los servidores de Google el cifrado y salting de contraseñas de los usuarios mediante algoritmos criptográficos robustos de estándar industrial.</li>
+      <li><strong>Reglas de Seguridad Granulares:</strong> Se han configurado detalladamente las reglas de Firebase Firestore (`firestore.rules`) para validar que las operaciones de lectura y escritura sobre los documentos estén restringidas únicamente a usuarios autenticados que sean propietarios del respectivo espacio de datos, bloqueando cualquier intento de consulta cross-tenant.</li>
+      <li><strong>Protección contra ataques XSS y CSRF:</strong> El frontend en Next.js cuenta con protección contra inyección de código al escapar automáticamente los inputs en el renderizado de React, minimizando los riesgos tradicionales en el intercambio de datos dinámicos.</li>
+    </ul>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 3: METODOLOGÍA Y HERRAMIENTAS
+     ========================================== -->
+  <div class="content-section">
+    <h1>3. Metodología y Herramientas</h1>
+    <h2>3.1. Metodología de Desarrollo</h2>
+    <p>
+      Para la ejecución del proyecto de manera organizada y sistemática, se ha adoptado una metodología ágil basada en <strong>Scrum</strong>, dividiendo el ciclo de vida del desarrollo en sprints estructurados de dos semanas de duración. La visibilidad de los entregables y la distribución de las tareas se gestiona de forma profesional mediante un tablero Kanban digital en la plataforma Trello, permitiendo rastrear el estado real del trabajo e iterar rápidamente ante la aparición de refinamientos o nuevos requisitos de negocio.
+    </p>
+    
+    <h2>3.2. Arquitectura Tecnológica y Stack de Software</h2>
+    <p>
+      La arquitectura tecnológica se caracteriza por un enfoque puramente "serverless", moderno y tipado estrictamente de extremo a extremo:
+    </p>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Tecnología</th>
+            <th>Rol en la Arquitectura</th>
+            <th>Justificación Técnica</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Next.js 16 (App Router)</strong></td>
+            <td>Frontend & Server Rendering</td>
+            <td>Ofrece una navegación ultra-rápida, optimización nativa de imágenes y enrutamiento basado en carpetas sumamente escalable.</td>
+          </tr>
+          <tr>
+            <td><strong>React 19 & TypeScript</strong></td>
+            <td>Componentes e Interfaces de datos</td>
+            <td>Garantiza tipado estático riguroso que previene fallos numéricos en coma flotante y facilita la escalabilidad del código.</td>
+          </tr>
+          <tr>
+            <td><strong>Firebase Auth & Firestore</strong></td>
+            <td>Backend-as-a-Service (BaaS)</td>
+            <td>Servicio de base de datos NoSQL de bajísima latencia con sincronización en tiempo real y flujo de autenticación seguro e instantáneo.</td>
+          </tr>
+          <tr>
+            <td><strong>Tailwind CSS v4</strong></td>
+            <td>Framework de Estilos Visuales</td>
+            <td>Permite un diseño visual premium y fluido mediante utility classes de alto rendimiento CSS sin código redundante.</td>
+          </tr>
+          <tr>
+            <td><strong>Web Speech API (Nativa)</strong></td>
+            <td>Reconocimiento y Síntesis de voz</td>
+            <td>Habilita el motor de interacción por voz de BakeryAI sin costes adicionales ni latencias de APIs de terceros.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="info-callout">
+      <p>
+        <strong>Nota de Arquitectura:</strong> El stack "serverless" adoptado elimina por completo la necesidad de mantener servidores locales o instancias virtuales encendidas continuamente, lo que reduce a cero los costes fijos de mantenimiento de infraestructura para los clientes de BakeryOS.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 4: PLANIFICACIÓN DEL PROYECTO
+     ========================================== -->
+  <div class="content-section">
+    <h1>4. Planificación del Proyecto</h1>
+    <h2>4.1. Fases del Proyecto y Cronograma</h2>
+    <p>
+      El proyecto ha sido estructurado temporalmente en cinco fases críticas, distribuidas de forma que los sprints iniciales consoliden las bases funcionales e infraestructuras, mientras que los sprints avanzados se enfoquen en la integración, usabilidad superior y optimizaciones técnicas:
+    </p>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Fase / Sprint</th>
+            <th>Objetivos Clave</th>
+            <th>Entregables Principales</th>
+            <th>Fechas de Ejecución</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sprint 1: Core & Auth</strong></td>
+            <td>Inicialización y Base de Datos</td>
+            <td>Configuración Next.js/Firebase, CRUD completo de Inventario y Control de Accesos de usuarios.</td>
+            <td>Enero 2026</td>
+          </tr>
+          <tr>
+            <td><strong>Sprint 2: UX & Refinamiento</strong></td>
+            <td>Estética Superior y Modo Oscuro</td>
+            <td>Carga de imágenes de perfil en Firebase Storage, corrección de decimales y steppers en inputs.</td>
+            <td>Febrero - Marzo 2026</td>
+          </tr>
+          <tr>
+            <td><strong>Sprint 3: Producción & DB Layer</strong></td>
+            <td>Lógica de Obrador y Robustez</td>
+            <td>Estandarización del patrón Repository, transacciones atómicas Firestore en la producción diaria.</td>
+            <td>Marzo - Abril 2026</td>
+          </tr>
+          <tr>
+            <td><strong>Sprint 4: BakeryAI & Notificaciones</strong></td>
+            <td>IA Conversacional y Premium UI</td>
+            <td>Desarrollo del motor NLP de BakeryAI, control de voz y Contexto Global de Notificaciones (Toasts).</td>
+            <td>Abril - Mayo 2026</td>
+          </tr>
+          <tr>
+            <td><strong>Fase 5: Cierre & Defensa</strong></td>
+            <td>Estabilización y Documentación</td>
+            <td>Generación de la memoria final PDF mediante WeasyPrint y preparación de la presentación de defensa.</td>
+            <td>Junio 2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 5: ALCANCE Y FUNCIONALIDADES
+     ========================================== -->
+  <div class="content-section">
+    <h1>5. Alcance y Funcionalidades del Sistema</h1>
+    <h2>5.1. Funcionalidades Principales por Módulo</h2>
+    <p>
+      El sistema BakeryOS se articula en torno a los siguientes bloques funcionales:
+    </p>
+    <ul>
+      <li><strong>Módulo de Dashboard Integrado:</strong> Muestra indicadores de rendimiento (KPIs) clave en tiempo real, incluyendo el total de producción pendiente para el día, número de pedidos a despachar y alertas inmediatas sobre ingredientes con stock en estado crítico.</li>
+      <li><strong>Módulo de Inventario Avanzado:</strong> Permite gestionar el alta, edición y eliminación de ingredientes y productos elaborados. El inventario cuenta con filtros inteligentes y estados visuales basados en el stock mínimo fijado por el panadero.</li>
+      <li><strong>Módulo de Fórmulas y Obrador (Producción):</strong> Gestión de los escandallos asociados a cada producto de venta. Habilita la planificación diaria de horneados estimando costes teóricos y tiempos de producción.</li>
+      <li><strong>Módulo CRM (Clientes y Pedidos de Venta):</strong> Facilita el control de clientes, el registro de pedidos puntuales y la programación de pedidos periódicos de distribución continua a cafeterías y comercios asociados.</li>
+      <li><strong>Módulo de Facturación Automatizada:</strong> Agrupa pedidos completados de un mismo cliente para generar facturas formalizadas en PDF con cálculo automático de impuestos correspondientes (IVA).</li>
+      <li><strong>Asistente Virtual BakeryAI:</strong> Habilita la interacción a través de reconocimiento de voz y comandos textuales, procesando órdenes de actualización de inventario e informes de stock de forma verbal e interactiva.</li>
+    </ul>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 6: ENTORNO DE TRABAJO Y PROTOTIPADO
+     ========================================== -->
+  <div class="content-section">
+    <h1>6. Entorno de Trabajo y Prototipado</h1>
+    <h2>6.1. Enlaces a los Entornos de Trabajo</h2>
+    <p>
+      Para garantizar el rigor académico y facilitar el control docente, los entornos reales de BakeryOS están disponibles y actualizados continuamente en las siguientes direcciones de producción y desarrollo:
+    </p>
+    <ul>
+      <li><strong>Repositorio Oficial de Código en GitHub:</strong> <a href="https://github.com/noah-catalan/BakeryOS">https://github.com/noah-catalan/BakeryOS</a></li>
+      <li><strong>Tablero Ágil de Planificación en Trello:</strong> <a href="https://trello.com/invite/b/692f69bab074d10d74744f6d/ATTI8f9e5e8ae58877b786eae85723d4f0282A945F51/bakeryos">Tablero Kanban BakeryOS</a></li>
+      <li><strong>Despliegue en Producción (Vercel):</strong> <a href="https://bakery-os-ten.vercel.app/">https://bakery-os-ten.vercel.app/</a></li>
+      <li><strong>Credenciales del Entorno de Demostración:</strong>
+        <ul>
+          <li><strong>Usuario Administrador:</strong> <code>admin@bakeryos.com</code></li>
+          <li><strong>Contraseña de Acceso:</strong> <code>admin123</code></li>
+        </ul>
+      </li>
+    </ul>
+    <h2>6.2. Metodología de Flujo de Trabajo en Git (Git Flow Simplificado)</h2>
+    <p>
+      A nivel de control de versiones se ha seguido una rama <code>main</code> permanentemente enlazada con Vercel para despliegue continuo (CI/CD), utilizando ramas de características temporales (<code>feature/nombre-de-la-mejora</code>) para aislar los cambios del código en desarrollo, garantizando que el entorno público de producción permanezca siempre funcional y libre de regresiones.
+    </p>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 7: DESARROLLO DE SPRINTS 1 Y 2
+     ========================================== -->
+  <div class="content-section">
+    <h1>7. Desarrollo de Sprints 1 y 2</h1>
+    <h2>7.1. Sprint 1: Construcción del Core e Infraestructura Base</h2>
+    <p>
+      Durante el Sprint 1 se sentaron los cimientos de BakeryOS. Se inicializó la aplicación en Next.js estructurando el enrutador basado en <code>src/app</code>. Se conecó con el proyecto Firebase y se configuró Firebase Auth para bloquear las rutas del ERP, redirigiendo a los usuarios no autenticados a la vista de Login. 
+    </p>
+    <p>
+      Adicionalmente, se desarrolló el CRUD de inventario en tiempo real sobre Firebase Firestore, permitiendo dar de alta materias primas que inmediatamente se actualizan en los clientes conectados. Para validar la efectividad de la base de datos NoSQL, se programó un script de generación de datos semilla (Seeding) capaz de rellenar la base de datos con ingredientes básicos, recetas preconfiguradas y clientes ficticios con un solo clic.
+    </p>
+
+    <h2>7.2. Sprint 2: Estandarización Visual, Control Numérico y Modo Oscuro</h2>
+    <p>
+      En esta etapa se refinó sustancialmente la experiencia del usuario (UX) para dar al software un acabado profesional. Se implementó un motor dinámico de cambio de temática mediante variables CSS que permite alternar entre modo claro y oscuro de manera impecable, guardando la preferencia del usuario en el <code>localStorage</code> del navegador. 
+    </p>
+    <p>
+      Para dar soporte al obrador en la carga de documentos e información personal, se integró el almacenamiento de imágenes de perfil directamente conectadas con Firebase Storage. Por último, se corrigió un problema crítico de imprecisión en los cálculos decimales mediante el formateo numérico con <code>toFixed(2)</code> y se ajustó la lógica en los steppers incrementales de cantidad para respetar siempre los stocks mínimos de cada ingrediente, impidiendo el registro inadvertido de mermas ficticias o valores erróneos.
+    </p>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 8: SPRINT 3: ARQUITECTURA REPOSITORY Y PRODUCCIÓN AUTOMATIZADA
+     ========================================== -->
+  <div class="content-section">
+    <h1>8. Desarrollo de Sprint 3: Arquitectura y Producción Automatizada</h1>
+    <h2>8.1. Problemática Inicial y Necesidad de Refactorización</h2>
+    <p>
+      Inicialmente, BakeryOS realizaba llamadas directas a las funciones del SDK de Firebase Firestore (como <code>addDoc</code>, <code>updateDoc</code>, o <code>deleteDoc</code>) dispersas en el código de múltiples vistas y componentes React. Este diseño, aunque sencillo en etapas iniciales, generaba un fuerte acoplamiento a Firebase y dificultaba enormemente la mantenibilidad y la implementación de pruebas unitarias. Asimismo, las operaciones complejas (como deducir ingredientes del inventario al finalizar una orden de producción) requerían orquestar múltiples lecturas y escrituras consecutivas, exponiendo al sistema a condiciones de carrera o inconsistencias de datos en caso de cortes de red.
+    </p>
+
+    <h2>8.2. Solución Aplicada: Patrón Repository (Capa de Servicios Decoplada)</h2>
+    <p>
+      Para subsanar esta debilidad de arquitectura, se implementó el <strong>Patrón Repository</strong> mediante una capa de servicio centralizada en <code>src/lib/services/db.ts</code>. Esta clase aislada, denominada <code>dbService</code>, actúa como un punto único de interacción con la persistencia de datos. De esta forma, las páginas y componentes del frontend consumen métodos de alto nivel con nombres de dominio semánticos, desconociendo por completo la lógica interna de almacenamiento de Firestore.
+    </p>
+    <p>
+      A continuación se detalla la implementación técnica de la interfaz genérica y del servicio de base de datos consolidado para BakeryOS:
+    </p>
+    
+    <div class="code-box">
+// src/lib/services/db.ts
+import { db } from "../firebase";
+import { 
+  collection, doc, addDoc, updateDoc, deleteDoc, 
+  getDocs, getDoc, query, where, writeBatch 
+} from "firebase/firestore";
+
+class DatabaseService {
+  // --- INGREDIENTES REPOSITORY ---
+  async getIngredients(userId: string) {
+    const q = query(collection(db, "ingredientes"), where("userId", "==", userId));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+
+  async saveIngredient(id: string | null, data: any) {
+    if (id) {
+      await updateDoc(doc(db, "ingredientes", id), data);
+    } else {
+      await addDoc(collection(db, "ingredientes"), data);
+    }
+  }
+
+  // --- TRANSACCIÓN COMPLEJA DE PRODUCCIÓN (BATCH WRITES) ---
+  async completeProductionOrder(orderId: string, recipe: any, factor: number, ingredientsDb: any[]) {
+    const batch = writeBatch(db);
+
+    // 1. Recorrer ingredientes de la receta y deducir del stock actual
+    for (const ingReq of recipe.ingredientes_necesarios) {
+      const dbIng = ingredientsDb.find(i => i.id === ingReq.ingredienteId);
+      if (dbIng) {
+        const totalConsumido = ingReq.cantidad * factor;
+        const nuevoStock = Math.max(0, dbIng.stockActual - totalConsumido);
+
+        // Recálculo del estado del ingrediente basado en stock mínimo
+        let nuevoEstado = dbIng.estado;
+        if (nuevoStock <= dbIng.stockMinimo / 2) nuevoEstado = 'alerta';
+        else if (nuevoStock <= dbIng.stockMinimo) nuevoEstado = 'bajo';
+        else nuevoEstado = 'ok';
+
+        batch.update(doc(db, "ingredientes", dbIng.id), {
+          stockActual: nuevoStock,
+          estado: nuevoEstado
+        });
+      }
+    }
+
+    // 2. Marcar la orden de producción como completada
+    batch.update(doc(db, "ordenesProduccion", orderId), {
+      estado: 'completada',
+      fechaCompletada: Date.now()
+    });
+
+    // 3. Confirmar la transacción atómica
+    await batch.commit();
+  }
+}
+
+export const dbService = new DatabaseService();</div>
+
+    <h2>8.3. Gestión Atómica de Inventario en Órdenes de Producción</h2>
+    <p>
+      El mayor logro de este sprint reside en la automatización del proceso de producción diaria. Cuando un panadero marca una orden de producción como "Completada", el software calcula instantáneamente el consumo real de ingredientes multiplicando las proporciones de la receta por las tandas (lotes) producidas.
+    </p>
+    <p>
+      Gracias al uso de <code>writeBatch(db)</code> expuesto en nuestro servicio desacoplado, todas las actualizaciones de stock de los ingredientes y el cambio de estado de la orden de producción se ejecutan de manera <strong>atómica</strong> en una sola llamada de red. Esto asegura que o bien se procesan todas las deducciones de stock de forma consistente, o bien la orden no cambia de estado en absoluto en caso de fallo, protegiendo al obrador de descuadres contables accidentales.
+    </p>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 9: SPRINT 4: BAKERYAI NLP Y NOTIFICACIONES PREMIUM
+     ========================================== -->
+  <div class="content-section">
+    <h1>9. Desarrollo de Sprint 4: BakeryAI NLP y Sistema de Notificaciones</h1>
+    <h2>9.1. BakeryAI: Motor de Procesamiento de Lenguaje Natural en Obrador</h2>
+    <p>
+      Un problema clásico en los sistemas ERP tradicionales es la fricción en la entrada de datos. Para un panadero profesional que está elaborando masa a mano, interactuar continuamente con pantallas táctiles, teclados y menús anidados resulta inviable y poco higiénico.
+    </p>
+    <p>
+      Para solucionar este escollo, el Sprint 4 introdujo el módulo <strong>BakeryAI</strong> en <code>src/app/asistente/page.tsx</code>. Este motor combina el reconocimiento de voz nativo en español del navegador (Web Speech API) con un procesador léxico e interpretativo (NLP Parser) programado específicamente para interactuar con la persistencia de datos del ERP.
+    </p>
+    <p>
+      El parser analiza comandos conversacionales estructurados de manera semántica, traduciéndolos a acciones directas en la base de datos Firestore y mostrando de forma inmediata "Action Cards" con la respuesta. Los comandos admitidos incluyen:
+    </p>
+    <ul>
+      <li><strong>Gestión de Inventario:</strong> <em>"añadir 20 a Harina de Fuerza T80"</em> o <em>"restar 5 a Azúcar Blanco"</em>. El sistema localiza el ingrediente, actualiza su valor acumulado de stock y recalcula sus rangos de alerta.</li>
+      <li><strong>Consultas Rápidas:</strong> <em>"¿Qué ingredientes están bajo mínimos?"</em> o <em>"mostrar alertas"</em>. BakeryAI filtra los ingredientes que se encuentran en estado 'bajo' o 'alerta' y los presenta en un carrusel interactivo en pantalla.</li>
+      <li><strong>Creación de Ítems:</strong> <em>"crear ingrediente Harina de Centeno en Harinas con stock mínimo 10"</em>. El parser extrae la categoría, nombre y límites para dar de alta el documento en Firestore en tiempo real.</li>
+    </ul>
+
+    <div class="code-box">
+// Fragmento del NLP Parser de BakeryAI (src/app/asistente/page.tsx)
+const processCommand = async (text: string) => {
+  const normalized = text.toLowerCase().trim();
+  
+  // Expresión regular para adición y sustracción de stock
+  const stockMatch = normalized.match(/(añadir|sumar|restar|quitar)\s+(\d+)\s+a\s+(.+)/);
+  if (stockMatch) {
+    const action = stockMatch[1];
+    const qty = parseInt(stockMatch[2]);
+    const ingredientName = stockMatch[3].trim();
+    
+    // Búsqueda del ingrediente en base de datos
+    const ing = findIngredientByName(ingredientName);
+    if (ing) {
+      const currentQty = ing.stockActual;
+      const newQty = (action === 'añadir' || action === 'sumar') ? currentQty + qty : Math.max(0, currentQty - qty);
+      
+      await dbService.updateIngredientStock(ing.id, newQty);
+      return { success: true, message: `Stock de "${ing.nombre}" actualizado a ${newQty} kg.` };
+    }
+  }
+  
+  // Comando de consulta de alertas de stock
+  if (normalized.includes("bajo mínimos") || normalized.includes("alerta")) {
+    const alerts = getIngredientsInAlert();
+    return { success: true, data: alerts, type: 'alertList' };
+  }
+  
+  return { success: false, message: "No he podido comprender la orden. Inténtalo de nuevo." };
+};</div>
+
+    <h2>9.2. Sistema de Notificaciones Toasts de Diseño Premium (Glassmorphic)</h2>
+    <p>
+      Originalmente, la interfaz de BakeryOS arrojaba alertas nativas del navegador (<code>alert()</code>), las cuales interrumpían drásticamente la navegación de los usuarios, bloqueaban la ejecución del hilo principal de Javascript y presentaban un diseño amateur y tosco.
+    </p>
+    <p>
+      Para dotar a la plataforma de un acabado verdaderamente profesional y consistente, se construyó e integró un sistema de notificaciones global basado en el patrón React Provider (<code>src/context/ToastContext.tsx</code>). Este framework proporciona un hook reutilizable (<code>useToast</code>) que permite lanzar alertas contextuales no intrusivas:
+    </p>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Método del Hook</th>
+            <th>Tipo de Alerta</th>
+            <th>Uso Recomendado en BakeryOS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>toast.success("...")</code></td>
+            <td>Confirmación (Verde)</td>
+            <td>Confirmar la creación exitosa de recetas, guardado de clientes y finalización de horneados.</td>
+          </tr>
+          <tr>
+            <td><code>toast.error("...")</code></td>
+            <td>Error crítico (Rojo)</td>
+            <td>Informar fallos de red con Firestore, errores al procesar facturas o validación fallida.</td>
+          </tr>
+          <tr>
+            <td><code>toast.warning("...")</code></td>
+            <td>Advertencia (Amarillo)</td>
+            <td>Alertar que una orden de producción consume más stock del que se dispone en el obrador.</td>
+          </tr>
+          <tr>
+            <td><code>toast.info("...")</code></td>
+            <td>Información (Azul)</td>
+            <td>Notificaciones de BakeryAI relativas a la activación del motor de escucha por voz.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Las tarjetas visuales de notificación han sido maquetadas con un estilo premium e hipermoderno empleando <strong>glassmorphism</strong> (fondos semi-translúcidos y difuminado de fondo <code>backdrop-filter: blur(10px)</code>) y equipadas con transiciones CSS de desplazamiento lateral (fade-in/fade-out) y una barra de progreso que indica el temporizador de auto-descarte (4 segundos), transformando radicalmente la UX de la herramienta.
+    </p>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 10: CONCLUSIONES
+     ========================================== -->
+  <div class="content-section">
+    <h1>10. Conclusiones y Trabajo Futuro</h1>
+    <h2>10.1. Evaluación del Proyecto y Objetivos Logrados</h2>
+    <p>
+      BakeryOS ha culminado su desarrollo consolidándose como un ERP altamente especializado que satisface de forma excepcional los requisitos iniciales del proyecto. La digitalización integral del flujo operativo ha permitido sustituir las herramientas manuales tradicionales por un entorno de datos en tiempo real de bajísima fricción. La implantación de la arquitectura de servicios desacoplada (Repository Pattern) dota a la aplicación de bases firmes para facilitar su mantenimiento y evolución técnica futura.
+    </p>
+    <p>
+      Asimismo, la culminación exitosa del asistente conversacional <strong>BakeryAI</strong> y la renovación de la interfaz visual de alertas demuestran que es posible aproximar la inteligencia artificial aplicada y las técnicas de usabilidad de alta gama a sectores artesanales que habitualmente se encuentran rezagados en el proceso de transformación digital.
+    </p>
+
+    <h2>10.2. Trabajo Futuro y Líneas de Expansión</h2>
+    <p>
+      Como líneas de trabajo futuras para la escalabilidad comercial y técnica de BakeryOS, se proponen los siguientes módulos de expansión:
+    </p>
+    <ul>
+      <li><strong>Integración con LLMs Conversacionales Avanzados:</strong> Migrar el motor NLP simplificado a un asistente impulsado por modelos más complejos (como Gemini Nano o APIs serverless de lenguaje), capacitando a BakeryAI para contestar consultas predictivas de ventas de gran complejidad (ej: <em>"¿Qué cantidades de harina deberé comprar para los pedidos del próximo viernes basándote en la previsión del tiempo?"</em>).</li>
+      <li><strong>Módulo de Trazabilidad por Lotes:</strong> Incorporar el seguimiento integral de lotes de materias primas con fechas de caducidad automatizadas, alertando al panadero de la proximidad del vencimiento de harinas y levaduras específicas.</li>
+      <li><strong>Conexión con Balanzas y Maquinaria IoT:</strong> Habilitar la sincronización directa mediante Bluetooth con básculas de obrador para volcar el pesaje real de los ingredientes al escandallo de la receta de forma completamente automatizada.</li>
+    </ul>
+  </div>
+
+</body>
+</html>

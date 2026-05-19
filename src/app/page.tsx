@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { collection, onSnapshot, query, where, getDocs, writeBatch, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import {
   TrendingUp, Package, Clock, AlertTriangle,
   ShoppingCart, CheckCircle, ChefHat, ArrowRight, Sparkles
@@ -70,6 +71,7 @@ function TableSkeleton() {
 
 export default function Home() {
   const { user } = useAuth();
+  const toast = useToast();
   const [ingresosMes, setIngresosMes] = useState(0);
   const [pedidosPendientes, setPedidosPendientes] = useState(0);
   const [ordenesEnProceso, setOrdenesEnProceso] = useState(0);
@@ -222,10 +224,10 @@ export default function Home() {
       demoRecetas.forEach(rec => { batch.set(doc(collection(db, "recetas")), rec); });
 
       await batch.commit();
-      alert("✅ Datos Demo generados correctamente.");
+      toast.success("Datos Demo generados correctamente.");
     } catch (error) {
       console.error(error);
-      alert("❌ Error generando datos demo.");
+      toast.error("Error generando datos demo.");
     } finally {
       setLoading(false);
     }

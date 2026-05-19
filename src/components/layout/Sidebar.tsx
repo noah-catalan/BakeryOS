@@ -13,7 +13,8 @@ import {
     UserCircle,
     Menu,
     ChevronLeft,
-    X
+    X,
+    Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -36,6 +37,7 @@ const NAV_OPERATIVA: NavItem[] = [
     { href: '/inventario', label: 'Inventario', icon: <Package size={18} />, title: 'Inventario' },
     { href: '/produccion', label: 'Producción', icon: <ChefHat size={18} />, title: 'Producción' },
     { href: '/clientes', label: 'Clientes y Pedidos', icon: <Users size={18} />, title: 'Clientes y Pedidos' },
+    { href: '/asistente', label: 'Asistente IA', icon: <Sparkles size={18} />, title: 'Asistente IA' },
 ];
 
 const NAV_ADMIN: NavItem[] = [
