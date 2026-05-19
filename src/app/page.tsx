@@ -6,7 +6,7 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import {
   TrendingUp, Package, Clock, AlertTriangle,
-  ShoppingCart, CheckCircle, ChefHat, ArrowRight
+  ShoppingCart, CheckCircle, ChefHat, ArrowRight, Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -15,27 +15,72 @@ import { SaleOrder } from "@/types/clients";
 import { ProductionOrder } from "@/types/production";
 import { Ingredient } from "@/types/inventory";
 
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 7) return "Buenas noches";
+  if (h < 13) return "Buenos días";
+  if (h < 20) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+/* ── Skeleton Components ── */
+function KPISkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-start gap-4">
+          <div className="skeleton w-12 h-12 rounded-xl" />
+          <div className="flex-1 space-y-2 pt-1">
+            <div className="skeleton h-3 w-24 rounded" />
+            <div className="skeleton h-7 w-20 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ChartSkeleton() {
+  return (
+    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+      <div className="skeleton h-5 w-48 rounded mb-6" />
+      <div className="skeleton h-64 w-full rounded-xl" />
+    </div>
+  );
+}
+
+function TableSkeleton() {
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <div className="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+        <div className="skeleton h-5 w-40 rounded" />
+      </div>
+      <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="px-5 py-4 flex items-center gap-4">
+            <div className="skeleton h-4 w-32 rounded" />
+            <div className="skeleton h-4 w-20 rounded ml-auto" />
+            <div className="skeleton h-5 w-16 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const { user } = useAuth();
-  // KPI Data
   const [ingresosMes, setIngresosMes] = useState(0);
   const [pedidosPendientes, setPedidosPendientes] = useState(0);
   const [ordenesEnProceso, setOrdenesEnProceso] = useState(0);
   const [alertasStock, setAlertasStock] = useState<Ingredient[]>([]);
   const [ultimosPedidos, setUltimosPedidos] = useState<SaleOrder[]>([]);
-
-  // For Chart
   const [salesData, setSalesData] = useState<{ name: string, ventas: number }[]>([]);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) { setLoading(false); return; }
 
-    // 1. Ingresos y Gráfico
     const qFacturas = query(collection(db, "facturas"), where("userId", "==", user.uid));
     const unsubscribeFacturas = onSnapshot(qFacturas, (snapshot) => {
       const startOfMonth = new Date();
@@ -46,21 +91,17 @@ export default function Home() {
       const facturasValidas = snapshot.docs.map(doc => doc.data() as Invoice)
         .filter(fac => (fac.estado === 'emitida' || fac.estado === 'pagada'));
 
-      // Calculate this month's revenue
       facturasValidas.forEach(fac => {
-        if (fac.fechaEmision >= startOfMonth.getTime()) {
-          ingresos += fac.total;
-        }
+        if (fac.fechaEmision >= startOfMonth.getTime()) ingresos += fac.total;
       });
       setIngresosMes(ingresos);
 
-      // Calculate Last 7 Days for Chart
       const chartMap = new Map();
       const today = new Date();
       for (let i = 6; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
-        const dateStr = d.toLocaleDateString('es-ES', { weekday: 'short' }); // "lun", "mar", etc.
+        const dateStr = d.toLocaleDateString('es-ES', { weekday: 'short' });
         chartMap.set(dateStr, 0);
       }
 
@@ -82,39 +123,28 @@ export default function Home() {
         ventas
       }));
       setSalesData(newChartData);
-
     });
 
-    // 2. Pedidos Pendientes & Últimos Pedidos
     const qPedidos = query(collection(db, "pedidosVenta"), where("userId", "==", user.uid));
     const unsubscribePedidos = onSnapshot(qPedidos, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as SaleOrder[];
-
-      // Pending count
-      const pendientesCount = data.filter(p => p.estado === 'pendiente').length;
-      setPedidosPendientes(pendientesCount);
-
-      // Latest 5
+      setPedidosPendientes(data.filter(p => p.estado === 'pendiente').length);
       data.sort((a, b) => b.fechaCreacion - a.fechaCreacion);
       setUltimosPedidos(data.slice(0, 5));
     });
 
-    // 3. Órdenes de Producción Activas
     const qProduccion = query(collection(db, "ordenesProduccion"), where("userId", "==", user.uid));
     const unsubscribeProduccion = onSnapshot(qProduccion, (snapshot) => {
       const data = snapshot.docs.map(doc => doc.data() as ProductionOrder);
-      const enProcesoCount = data.filter(o => o.estado === 'pendiente' || o.estado === 'enProceso').length;
-      setOrdenesEnProceso(enProcesoCount);
+      setOrdenesEnProceso(data.filter(o => o.estado === 'pendiente' || o.estado === 'enProceso').length);
     });
 
-    // 4. Inventario - Alertas de Stock
     const qInventario = query(collection(db, "ingredientes"), where("userId", "==", user.uid));
     const unsubscribeInventario = onSnapshot(qInventario, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Ingredient[];
       const kriticos = data.filter(ing => ing.stockActual <= ing.stockMinimo);
       kriticos.sort((a, b) => (a.stockActual / a.stockMinimo) - (b.stockActual / b.stockMinimo));
       setAlertasStock(kriticos);
-
       setLoading(false);
     });
 
@@ -127,23 +157,17 @@ export default function Home() {
   }, [user]);
 
   const handleSeedData = async () => {
-    if (!confirm("⚠️ ¿Estás seguro de que quieres BORRAR TODOS LOS DATOS (Ingredientes, Clientes, Recetas) preexistentes y generar el Demo realista?")) return;
+    if (!confirm("⚠️ ¿Estás seguro de que quieres BORRAR TODOS LOS DATOS y generar el Demo realista?")) return;
     setLoading(true);
-
     try {
       const batch = writeBatch(db);
-
-      // 1. Borrar colecciones actuales del usuario
       const colsToClear = ["ingredientes", "clientes", "recetas", "ordenesProduccion", "pedidosVenta", "facturas"];
       for (const colName of colsToClear) {
         const q = query(collection(db, colName), where("userId", "==", user?.uid));
         const snapshot = await getDocs(q);
-        snapshot.docs.forEach(d => {
-          batch.delete(doc(db, colName, d.id));
-        });
+        snapshot.docs.forEach(d => { batch.delete(doc(db, colName, d.id)); });
       }
 
-      // 2. Poblar Ingredientes (6)
       const demoIngredientes = [
         { nombre: "Harina de Fuerza T80", SKU: "HAR-001", categoria: "Harinas", stockActual: 120, stockMinimo: 50, unidad: "kg", estado: "ok", ultimaAct: Date.now(), userId: user?.uid },
         { nombre: "Levadura Fresca", SKU: "LEV-001", categoria: "Levaduras", stockActual: 2, stockMinimo: 5, unidad: "kg", estado: "bajo", ultimaAct: Date.now(), userId: user?.uid },
@@ -152,25 +176,19 @@ export default function Home() {
         { nombre: "Azúcar Blanco", SKU: "AZU-001", categoria: "Otros", stockActual: 40, stockMinimo: 15, unidad: "kg", estado: "ok", ultimaAct: Date.now(), userId: user?.uid },
         { nombre: "Chips de Chocolate 54%", SKU: "CHO-001", categoria: "Chocolates", stockActual: 8, stockMinimo: 10, unidad: "kg", estado: "bajo", ultimaAct: Date.now(), userId: user?.uid }
       ];
-
       const ingRefs = demoIngredientes.map(ing => {
         const ref = doc(collection(db, "ingredientes"));
         batch.set(ref, ing);
         return { id: ref.id, nombre: ing.nombre, unidad: ing.unidad };
       });
 
-      // 3. Poblar Clientes (3)
       const demoClientes = [
         { nombre: "Cafetería Central", tipo: "B2B", email: "pedidos@cafecentral.com", telefono: "600123456", direccion: "Gran Vía 12", ultimaAct: Date.now(), userId: user?.uid },
         { nombre: "Hotel Miramar*****", tipo: "B2B", email: "cocina@miramar.com", telefono: "611987654", direccion: "Paseo Marítimo 1", ultimaAct: Date.now(), userId: user?.uid },
         { nombre: "Restaurante El Puerto", tipo: "B2B", email: "info@elpuerto.es", telefono: "622334455", direccion: "Muelle 4", ultimaAct: Date.now(), userId: user?.uid }
       ];
-      demoClientes.forEach(cli => {
-        const ref = doc(collection(db, "clientes"));
-        batch.set(ref, cli);
-      });
+      demoClientes.forEach(cli => { batch.set(doc(collection(db, "clientes")), cli); });
 
-      // 4. Poblar Recetas (3)
       const demoRecetas = [
         {
           nombre: "Barra Rústica", mermasPermitidas: 2, ultimaAct: Date.now(), userId: user?.uid,
@@ -201,10 +219,7 @@ export default function Home() {
           ]
         }
       ];
-      demoRecetas.forEach(rec => {
-        const ref = doc(collection(db, "recetas"));
-        batch.set(ref, rec);
-      });
+      demoRecetas.forEach(rec => { batch.set(doc(collection(db, "recetas")), rec); });
 
       await batch.commit();
       alert("✅ Datos Demo generados correctamente.");
@@ -216,133 +231,116 @@ export default function Home() {
     }
   };
 
+  const kpiCards = [
+    { label: "Ingresos (Mes)", value: `${ingresosMes.toFixed(2)}€`, icon: <TrendingUp size={22} />, gradient: "from-emerald-500 to-teal-600", bgLight: "bg-emerald-50 dark:bg-emerald-950/30" },
+    { label: "Pedidos Pendientes", value: pedidosPendientes, icon: <ShoppingCart size={22} />, gradient: "from-blue-500 to-indigo-600", bgLight: "bg-blue-50 dark:bg-blue-950/30" },
+    { label: "Producción en Curso", value: ordenesEnProceso, icon: <ChefHat size={22} />, gradient: "from-violet-500 to-purple-600", bgLight: "bg-violet-50 dark:bg-violet-950/30" },
+    { label: "Alertas Stock", value: alertasStock.length, icon: alertasStock.length > 0 ? <AlertTriangle size={22} /> : <CheckCircle size={22} />, gradient: alertasStock.length > 0 ? "from-red-500 to-rose-600" : "from-slate-400 to-slate-500", bgLight: alertasStock.length > 0 ? "bg-red-50 dark:bg-red-950/30" : "bg-slate-50 dark:bg-slate-800/30" },
+  ];
+
   if (loading) {
-    return <div className="p-8 text-center text-slate-500 dark:text-slate-400">Cargando tablero y métricas...</div>;
+    return (
+      <div className="p-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
+        <div className="skeleton h-8 w-72 rounded-lg" />
+        <KPISkeleton />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8"><ChartSkeleton /><TableSkeleton /></div>
+          <div><TableSkeleton /></div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-slide-down">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Panel de Control Operativo</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
+            {getGreeting()} <span className="text-amber-500">👋</span>
+          </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Resumen de la actividad en tiempo real de BakeryOS.</p>
         </div>
         <button
           onClick={handleSeedData}
-          className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:bg-slate-800/50 hover:text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2"
-          title="Poblar base de datos con información realista"
+          className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-700 hover:text-amber-700 dark:hover:text-amber-400 px-4 py-2.5 rounded-xl transition-all duration-200 shadow-sm flex items-center gap-2"
         >
-          Generar Datos Demo
+          <Sparkles size={14} />
+          Generar Demo
         </button>
       </div>
 
       {/* KPI GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-            <TrendingUp size={24} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        {kpiCards.map((kpi, i) => (
+          <div key={i} className={`bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 animate-slide-up stagger-${i + 1}`}>
+            <div className={`p-3 rounded-xl bg-gradient-to-br ${kpi.gradient} text-white shadow-sm`}>
+              {kpi.icon}
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">{kpi.label}</p>
+              <h3 className={`text-2xl font-bold animate-count-up ${kpi.label === "Alertas Stock" && alertasStock.length > 0 ? 'text-red-600' : 'text-slate-900 dark:text-slate-50'}`}>{kpi.value}</h3>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Ingresos (Mes)</p>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{ingresosMes.toFixed(2)}€</h3>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-            <ShoppingCart size={24} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Pedidos Pendientes</p>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{pedidosPendientes}</h3>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow">
-          <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
-            <ChefHat size={24} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Producción en Curso</p>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{ordenesEnProceso}</h3>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow" title={alertasStock.length > 0 ? "Requiere atención prioritaria" : "Inventario saludable"}>
-          <div className={`p-3 rounded-lg ${alertasStock.length > 0 ? 'bg-red-50 text-red-600' : 'bg-slate-50 text-slate-400'}`}>
-            {alertasStock.length > 0 ? <AlertTriangle size={24} /> : <CheckCircle size={24} />}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Alertas Stock</p>
-            <h3 className={`text-2xl font-bold ${alertasStock.length > 0 ? 'text-red-600' : 'text-slate-900'}`}>{alertasStock.length}</h3>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {/* CHART & RECENT ORDERS */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Main Chart */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-50">Facturación (Últimos 7 días)</h3>
-            </div>
+          {/* Chart */}
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up stagger-3">
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-50 mb-6">Facturación — Últimos 7 días</h3>
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={salesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dx={-10} tickFormatter={(value) => `${value}€`} />
-                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} formatter={(value: any) => [`${value}€`]} />
-                  <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorVentas)" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" opacity={0.06} />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dx={-10} tickFormatter={(value) => `${value}€`} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '13px' }} formatter={(value: any) => [`${value}€`, 'Ventas']} />
+                  <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#colorVentas)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Últimos Pedidos */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
-            <div className="p-5 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50/50">
-              <h3 className="font-bold text-slate-800 dark:text-slate-50 flex items-center gap-2">
-                <Clock className="text-blue-600" size={18} />
+          {/* Recent Orders */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-slide-up stagger-4">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/30">
+              <h3 className="font-bold text-slate-800 dark:text-slate-50 flex items-center gap-2 text-sm">
+                <Clock className="text-blue-500" size={16} />
                 Últimos Pedidos de Venta
               </h3>
-              <Link href="/clientes" className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
-                Ver todos <ArrowRight size={14} />
+              <Link href="/clientes" className="text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 font-semibold flex items-center gap-1 transition-colors">
+                Ver todos <ArrowRight size={12} />
               </Link>
             </div>
-            <div className="flex-1 p-0 overflow-x-auto">
+            <div className="overflow-x-auto">
               {ultimosPedidos.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm">No hay pedidos recientes en la base de datos.</div>
+                <div className="p-10 text-center">
+                  <ShoppingCart className="mx-auto text-slate-300 dark:text-slate-700 mb-3" size={32} />
+                  <p className="text-sm text-slate-400 dark:text-slate-500">No hay pedidos recientes.</p>
+                  <Link href="/clientes" className="text-xs text-amber-600 hover:text-amber-700 font-medium mt-2 inline-block">Crear primer pedido →</Link>
+                </div>
               ) : (
-                <table className="min-w-full divide-y divide-slate-100">
-                  <tbody className="divide-y divide-slate-100">
+                <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-800">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {ultimosPedidos.map((pedido) => (
-                      <tr key={pedido.id} className="hover:bg-slate-50 dark:bg-slate-800/50 transition-colors">
-                        <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-900 dark:text-slate-50 w-1/3">
-                          {pedido.clienteNombre}
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
-                          {new Date(pedido.fechaCreacion).toLocaleDateString()}
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-slate-50 text-right">
-                          {pedido.total.toFixed(2)}€
-                        </td>
+                      <tr key={pedido.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-semibold text-slate-900 dark:text-slate-50 w-1/3">{pedido.clienteNombre}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">{new Date(pedido.fechaCreacion).toLocaleDateString()}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-slate-50 text-right">{pedido.total.toFixed(2)}€</td>
                         <td className="px-5 py-4 whitespace-nowrap text-right">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider
-                                                        ${pedido.estado === 'pendiente' ? 'bg-amber-100 text-amber-800' : ''}
-                                                        ${pedido.estado === 'entregado' ? 'bg-emerald-100 text-emerald-800' : ''}
-                                                        ${pedido.estado === 'cancelado' ? 'bg-red-100 text-red-800' : ''}
-                                                    `}>
-                            {pedido.estado}
-                          </span>
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider
+                            ${pedido.estado === 'pendiente' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400' : ''}
+                            ${pedido.estado === 'entregado' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400' : ''}
+                            ${pedido.estado === 'cancelado' ? 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-400' : ''}
+                          `}>{pedido.estado}</span>
                         </td>
                       </tr>
                     ))}
@@ -353,37 +351,38 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ALERTAS DE STOCK CRÍTICO */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-fit">
-          <div className="p-5 border-b border-red-50 flex items-center justify-between bg-red-50/30">
-            <h3 className="font-bold text-red-700 flex items-center gap-2">
-              <AlertTriangle size={18} />
-              Stock Crítico Prio.
+        {/* Stock Alerts */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-fit animate-slide-up stagger-5">
+          <div className={`p-5 border-b flex items-center justify-between ${alertasStock.length > 0 ? 'border-red-100 dark:border-red-900/30 bg-red-50/40 dark:bg-red-950/20' : 'border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30'}`}>
+            <h3 className={`font-bold flex items-center gap-2 text-sm ${alertasStock.length > 0 ? 'text-red-700 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'}`}>
+              {alertasStock.length > 0 ? <AlertTriangle size={16} /> : <CheckCircle size={16} />}
+              Stock Crítico
             </h3>
-            <Link href="/inventario" className="text-sm text-red-600 hover:text-red-800 font-medium">Revisar Repo.</Link>
+            <Link href="/inventario" className="text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 font-semibold transition-colors">Revisar</Link>
           </div>
-          <div className="flex-1 p-0">
+          <div>
             {alertasStock.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-sm flex flex-col items-center gap-2">
-                <CheckCircle className="text-emerald-500 mb-1" size={24} />
-                Inventario saludable.<br />Sin alertas de compra hoy.
+              <div className="p-10 text-center">
+                <CheckCircle className="mx-auto text-emerald-400 mb-3" size={32} />
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Inventario saludable</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Sin alertas de compra hoy.</p>
               </div>
             ) : (
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
                 {alertasStock.slice(0, 8).map((ing) => (
-                  <li key={ing.id} className="p-4 hover:bg-slate-50 dark:bg-slate-800/50 flex flex-col transition-colors border-l-4 border-red-400">
+                  <li key={ing.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 flex flex-col transition-colors border-l-4 border-red-400 dark:border-red-500">
                     <div className="flex justify-between items-start">
-                      <p className="font-bold text-slate-800 dark:text-slate-50 text-sm">{ing.nombre}</p>
-                      <p className="font-bold text-red-600">{ing.stockActual} <span className="text-xs font-normal">{ing.unidad}</span></p>
+                      <p className="font-semibold text-slate-800 dark:text-slate-50 text-sm">{ing.nombre}</p>
+                      <p className="font-bold text-red-600 dark:text-red-400">{ing.stockActual} <span className="text-xs font-normal">{ing.unidad}</span></p>
                     </div>
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 px-2 py-0.5 rounded">Min: {ing.stockMinimo} {ing.unidad}</span>
-                      <span className="text-xs font-medium text-red-500 uppercase tracking-tighter">Bajo Mínimos</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">Min: {ing.stockMinimo} {ing.unidad}</span>
+                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Bajo Mínimos</span>
                     </div>
                   </li>
                 ))}
                 {alertasStock.length > 8 && (
-                  <li className="p-3 text-center bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800/50">
+                  <li className="p-3 text-center bg-slate-50 dark:bg-slate-800/30">
                     <Link href="/inventario" className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-red-600">
                       + {alertasStock.length - 8} ingredientes más en alerta
                     </Link>
@@ -393,7 +392,6 @@ export default function Home() {
             )}
           </div>
         </div>
-
       </div>
     </div>
   );

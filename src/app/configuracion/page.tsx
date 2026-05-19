@@ -97,26 +97,26 @@ export default function ConfiguracionPage() {
     }
 
     return (
-        <div className="p-8 max-w-4xl mx-auto">
+        <div className="p-6 md:p-8 max-w-4xl mx-auto animate-fade-in">
             <div className="mb-8">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Configuración del Sistema</h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Ajusta los parámetros globales de la panadería y tus preferencias de usuario.</p>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
                 {/* Sidebar Setup Menu */}
                 <div className="w-full md:w-64 bg-slate-50 dark:bg-slate-800/50 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col flex-shrink-0">
                     <nav className="space-y-2">
                         <button
                             onClick={() => setActiveTab('negocio')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'negocio' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'}`}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${activeTab === 'negocio' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
                         >
                             <Building2 size={18} />
                             Datos del Negocio
                         </button>
                         <button
                             onClick={() => setActiveTab('perfil')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === 'perfil' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-200/50'}`}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${activeTab === 'perfil' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
                         >
                             <User size={18} />
                             Perfil y Preferencias
@@ -247,7 +247,7 @@ export default function ConfiguracionPage() {
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="inline-flex justify-center items-center gap-2 rounded-md border border-transparent bg-blue-600 py-2.5 px-6 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                                className="inline-flex justify-center items-center gap-2 rounded-xl border border-transparent bg-gradient-to-r from-amber-500 to-orange-600 py-2.5 px-6 text-sm font-medium text-white shadow-sm hover:from-amber-600 hover:to-orange-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:opacity-50 transition-all duration-200"
                             >
                                 <Save size={16} />
                                 {saving ? 'Guardando...' : 'Guardar Cambios'}

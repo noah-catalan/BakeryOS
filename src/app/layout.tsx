@@ -13,8 +13,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BakeryOS | ERP Panaderías",
-  description: "Sistema integral de gestión para panaderías y cafeterías",
+  title: "BakeryOS | ERP para Panaderías y Pastelerías",
+  description:
+    "Sistema integral de gestión empresarial (ERP) para panaderías y pastelerías. Controla inventario, producción, clientes, pedidos y facturación desde una única plataforma en la nube.",
+  keywords: [
+    "ERP",
+    "panadería",
+    "pastelería",
+    "gestión",
+    "inventario",
+    "producción",
+    "facturación",
+    "software",
+  ],
+  authors: [{ name: "Noah Catalán" }],
+  openGraph: {
+    title: "BakeryOS | ERP para Panaderías",
+    description:
+      "Gestión integral de panaderías y pastelerías. Inventario, producción, clientes y facturación en tiempo real.",
+    type: "website",
+    locale: "es_ES",
+  },
+  robots: "index, follow",
 };
 
 import ClientLayout from "@/components/layout/ClientLayout";
@@ -28,9 +48,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>

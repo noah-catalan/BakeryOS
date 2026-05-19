@@ -185,7 +185,7 @@ export default function ClientesPage() {
     };
 
     return (
-        <div className="p-8 max-w-7xl mx-auto">
+        <div className="p-6 md:p-8 max-w-7xl mx-auto animate-fade-in">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Módulo de Clientes y Pedidos</h2>
@@ -193,7 +193,7 @@ export default function ClientesPage() {
                 </div>
                 <button
                     onClick={() => activeTab === 'directorio' ? setShowClientForm(!showClientForm) : setShowOrderForm(!showOrderForm)}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-sm transition-colors"
+                    className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md"
                 >
                     <Plus size={16} />
                     {activeTab === 'directorio' ? 'Nuevo Cliente' : 'Nuevo Pedido'}
@@ -207,8 +207,8 @@ export default function ClientesPage() {
                         onClick={() => setActiveTab('directorio')}
                         className={`flex items-center gap-2 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors
                             ${activeTab === 'directorio'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                ? 'border-amber-500 text-amber-600 dark:text-amber-400'
+                                : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300'
                             }`}
                     >
                         <Users size={18} />
@@ -218,8 +218,8 @@ export default function ClientesPage() {
                         onClick={() => setActiveTab('pedidos')}
                         className={`flex items-center gap-2 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors
                             ${activeTab === 'pedidos'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                ? 'border-amber-500 text-amber-600 dark:text-amber-400'
+                                : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300'
                             }`}
                     >
                         <ShoppingBag size={18} />
