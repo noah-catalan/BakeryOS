@@ -431,9 +431,14 @@
         <span class="index-number">12</span>
       </div>
       <div class="index-item">
-        <span class="index-name">10. Conclusiones y Trabajo Futuro</span>
+        <span class="index-name">10. Desarrollo de Sprint 5: Integración con Gemini IA y Fabricación de Recetas</span>
         <span class="index-dots"></span>
         <span class="index-number">14</span>
+      </div>
+      <div class="index-item">
+        <span class="index-name">11. Conclusiones y Trabajo Futuro</span>
+        <span class="index-dots"></span>
+        <span class="index-number">16</span>
       </div>
     </div>
   </div>
@@ -873,11 +878,52 @@ const processCommand = async (text: string) => {
   </div>
 
   <!-- ==========================================
-     SECCIÓN 10: CONCLUSIONES
+     SECCIÓN 10: SPRINT 5: INTEGRACIÓN CON GEMINI IA Y FABRICACIÓN DE RECETAS
      ========================================== -->
   <div class="content-section">
-    <h1>10. Conclusiones y Trabajo Futuro</h1>
-    <h2>10.1. Evaluación del Proyecto y Objetivos Logrados</h2>
+    <h1>10. Desarrollo de Sprint 5: Integración con Gemini IA y Fabricación de Recetas</h1>
+    <h2>10.1. Objetivos del Sprint 5</h2>
+    <p>
+      El Sprint 5 representa la cumbre de la madurez tecnológica de BakeryOS, donde se ha superado el parser NLP rígido basado en expresiones regulares para dar paso a un asistente cognitivo impulsado por el modelo de lenguaje de última generación <strong>Google Gemini 2.5 Flash</strong>. Los objetivos centrales de este sprint son:
+    </p>
+    <ul>
+      <li><strong>Integración Segura de Claves de API:</strong> Proporcionar una pestaña en el panel de configuración ("Seguridad e Integraciones") para que cada panadero pueda guardar su clave de Gemini API de forma privada y de forma persistente en su documento de configuración en Firebase.</li>
+      <li><strong>Conversación Contextual Inteligente:</strong> Alimentar el modelo Gemini con el contexto de base de datos en tiempo real (nombres y stocks actuales de ingredientes del obrador, catálogo de recetas guardadas) permitiendo responder de forma totalmente adaptada al estado de la panadería.</li>
+      <li><strong>Fabricación Directa de Recetas (Fabricate-on-Demand):</strong> Habilitar la interpretación de recetas propuestas por el chatbot de forma que el panadero pueda guardarlas en el recetario del sistema y "fabricarlas al instante" restando del stock real los ingredientes consumidos en el lote de forma atómica.</li>
+    </ul>
+
+    <h2>10.2. Arquitectura de Integración de IA Generativa y System Prompting</h2>
+    <p>
+      Para lograr una integración estable sin añadir dependencias pesadas que pusieran en riesgo el rendimiento de carga del cliente, se implementó la comunicación directa con los endpoints REST de Google Generative AI en el navegador a través de llamadas de red estándar (Fetch API) parametrizando el modelo <code>gemini-2.5-flash</code> con la clave de API vinculada.
+    </p>
+    <p>
+      Para guiar al modelo a generar respuestas predecibles y estructuradas compatibles con el frontend en Next.js, se utilizó un System Prompt restrictivo que obliga al modelo a responder exclusivamente en formato JSON estructurado que incluye una respuesta textual en formato Markdown y un objeto opcional con la acción a ejecutar.
+    </p>
+    
+    <h2>10.3. Flujo de Trabajo: Fabricación Instantánea y Mapeo de Ingredientes</h2>
+    <p>
+      El flujo de fabricación representa la automatización de obrador más avanzada en BakeryOS:
+    </p>
+    <ol>
+      <li><strong>Consulta de Receta:</strong> El usuario solicita a BakeryAI una receta (ej: <em>"¿Cómo puedo hacer un lote de muffins de arándanos?"</em>).</li>
+      <li><strong>Generación e Identificación:</strong> Gemini formula las instrucciones de cocción y, paralelamente, construye la lista estructurada de ingredientes con sus respectivas cantidades.</li>
+      <li><strong>Mapeo de Almacén:</strong> El frontend analiza la lista de ingredientes recomendados. Si coinciden con ingredientes existentes en el inventario de la panadería, se marcan como "Mapeados" (vinculados al ID de base de datos correspondiente). Si no existen, se indica que se crearán automáticamente.</li>
+      <li><strong>Fabricación Atómica:</strong> El usuario dispone de tres acciones inmediatas a través de botones interactivos integrados en la tarjeta de chat:
+        <ul>
+          <li><strong>Guardar en Recetario:</strong> Guarda la estructura de la receta en el recetario de la base de datos de Firestore.</li>
+          <li><strong>Planificar Orden:</strong> Registra la receta y genera una orden de producción pendiente.</li>
+          <li><strong>Fabricar al Instante:</strong> Registra la receta, genera una orden de producción completada y ejecuta un lote de escritura atómica (Batch Write) restando del inventario las proporciones consumidas y actualizando de inmediato los estados de stock crítico.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <!-- ==========================================
+     SECCIÓN 11: CONCLUSIONES
+     ========================================== -->
+  <div class="content-section">
+    <h1>11. Conclusiones y Trabajo Futuro</h1>
+    <h2>11.1. Evaluación del Proyecto y Objetivos Logrados</h2>
     <p>
       BakeryOS ha culminado su desarrollo consolidándose como un ERP altamente especializado que satisface de forma excepcional los requisitos iniciales del proyecto. La digitalización integral del flujo operativo ha permitido sustituir las herramientas manuales tradicionales por un entorno de datos en tiempo real de bajísima fricción. La implantación de la arquitectura de servicios desacoplada (Repository Pattern) dota a la aplicación de bases firmes para facilitar su mantenimiento y evolución técnica futura.
     </p>
@@ -885,12 +931,12 @@ const processCommand = async (text: string) => {
       Asimismo, la culminación exitosa del asistente conversacional <strong>BakeryAI</strong> y la renovación de la interfaz visual de alertas demuestran que es posible aproximar la inteligencia artificial aplicada y las técnicas de usabilidad de alta gama a sectores artesanales que habitualmente se encuentran rezagados en el proceso de transformación digital.
     </p>
 
-    <h2>10.2. Trabajo Futuro y Líneas de Expansión</h2>
+    <h2>11.2. Trabajo Futuro y Líneas de Expansión</h2>
     <p>
       Como líneas de trabajo futuras para la escalabilidad comercial y técnica de BakeryOS, se proponen los siguientes módulos de expansión:
     </p>
     <ul>
-      <li><strong>Integración con LLMs Conversacionales Avanzados:</strong> Migrar el motor NLP simplificado a un asistente impulsado por modelos más complejos (como Gemini Nano o APIs serverless de lenguaje), capacitando a BakeryAI para contestar consultas predictivas de ventas de gran complejidad (ej: <em>"¿Qué cantidades de harina deberé comprar para los pedidos del próximo viernes basándote en la previsión del tiempo?"</em>).</li>
+      <li><strong>Agentes Autónomos de Compra y Aprovisionamiento:</strong> Ampliar el asistente para que actúe de manera activa generando órdenes de compra automáticas a proveedores cuando se detecten stocks críticos, enviando correos electrónicos redactados de forma autónoma.</li>
       <li><strong>Módulo de Trazabilidad por Lotes:</strong> Incorporar el seguimiento integral de lotes de materias primas con fechas de caducidad automatizadas, alertando al panadero de la proximidad del vencimiento de harinas y levaduras específicas.</li>
       <li><strong>Conexión con Balanzas y Maquinaria IoT:</strong> Habilitar la sincronización directa mediante Bluetooth con básculas de obrador para volcar el pesaje real de los ingredientes al escandallo de la receta de forma completamente automatizada.</li>
     </ul>

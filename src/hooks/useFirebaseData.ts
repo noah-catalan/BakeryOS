@@ -6,7 +6,7 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { Recipe, ProductionOrder } from "@/types/production";
 import { Ingredient } from "@/types/inventory";
-import { UserSettings, BusinessSettings } from "@/types/settings";
+import { UserSettings, BusinessSettings, IntegrationsSettings } from "@/types/settings";
 
 // Hook to fetch and manage Recipes
 export function useRecipes() {
@@ -99,7 +99,7 @@ export function useIngredients() {
 
 // Hook to fetch and manage Settings
 export function useSettings() {
-    const [settings, setSettings] = useState<{ user?: UserSettings, business?: BusinessSettings } | null>(null);
+    const [settings, setSettings] = useState<{ user?: UserSettings, business?: BusinessSettings, integrations?: IntegrationsSettings } | null>(null);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
 
@@ -113,7 +113,7 @@ export function useSettings() {
         const docRef = doc(db, "settings", user.uid);
         const unsubscribe = onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
-                setSettings(docSnap.data() as { user?: UserSettings, business?: BusinessSettings });
+                setSettings(docSnap.data() as { user?: UserSettings, business?: BusinessSettings, integrations?: IntegrationsSettings });
             } else {
                 setSettings(null);
             }

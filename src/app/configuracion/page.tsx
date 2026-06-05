@@ -5,13 +5,13 @@ import { Building2, User, Save, Shield, Bell } from "lucide-react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
-import { BusinessSettings, UserSettings } from "@/types/settings";
+import { BusinessSettings, UserSettings, IntegrationsSettings } from "@/types/settings";
 import { useTheme } from "next-themes";
 
 export default function ConfiguracionPage() {
     const { user } = useAuth();
     const { theme, setTheme } = useTheme();
-    const [activeTab, setActiveTab] = useState<'negocio' | 'perfil'>('negocio');
+    const [activeTab, setActiveTab] = useState<'negocio' | 'perfil' | 'integraciones'>('negocio');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState({ text: '', type: '' });
@@ -34,6 +34,10 @@ export default function ConfiguracionPage() {
         notificacionesPush: false,
     });
 
+    const [integrationsData, setIntegrationsData] = useState<IntegrationsSettings>({
+        geminiApiKey: '',
+    });
+
     useEffect(() => {
         const fetchSettings = async () => {
             if (!user) {
@@ -49,6 +53,7 @@ export default function ConfiguracionPage() {
                     const data = docSnap.data();
                     if (data.business) setBusinessData(data.business);
                     if (data.user) setUserData(data.user);
+                    if (data.integrations) setIntegrationsData(data.integrations);
                 }
             } catch (error) {
                 console.error("Error fetching config:", error);
@@ -71,6 +76,7 @@ export default function ConfiguracionPage() {
             await setDoc(docRef, {
                 business: businessData,
                 user: userData,
+                integrations: integrationsData,
                 updatedAt: Date.now()
             }, { merge: true });
 
@@ -121,8 +127,11 @@ export default function ConfiguracionPage() {
                             <User size={18} />
                             Perfil y Preferencias
                         </button>
-                        <hr className="my-4 border-slate-200 dark:border-slate-800" />
-                        <button disabled className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 opacity-60 cursor-not-allowed">
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('integraciones')}
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${activeTab === 'integraciones' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
+                        >
                             <Shield size={18} />
                             Seguridad e Integraciones
                         </button>
@@ -238,6 +247,40 @@ export default function ConfiguracionPage() {
                                                 <p className="text-slate-500 dark:text-slate-400">Alertas instantáneas en este navegador web cuando haya actualizaciones críticas.</p>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'integraciones' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-50 border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">Integraciones de Inteligencia Artificial</h3>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 rounded-2xl flex items-start gap-3.5 max-w-2xl">
+                                        <Shield className="text-amber-500 shrink-0 mt-1" size={20} />
+                                        <div className="space-y-1">
+                                            <h4 className="text-sm font-bold text-amber-800 dark:text-amber-400">Seguridad de la clave de API</h4>
+                                            <p className="text-xs text-amber-700 dark:text-amber-400/80 leading-relaxed">
+                                                Tu clave de API se guarda directamente en tu base de datos de Firebase asociada de forma privada a tu cuenta. Se utiliza únicamente desde tu navegador para interactuar con la API de Google Gemini de forma directa y privada.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="max-w-2xl">
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Clave de API de Gemini (Google AI Studio)</label>
+                                        <input 
+                                            type="password" 
+                                            value={integrationsData.geminiApiKey || ''} 
+                                            onChange={e => setIntegrationsData({ ...integrationsData, geminiApiKey: e.target.value })} 
+                                            className="mt-1 block w-full rounded-md border text-slate-900 dark:text-slate-50 border-slate-300 dark:border-slate-700 py-2 px-3 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 sm:text-sm" 
+                                            placeholder="AIzaSy..." 
+                                        />
+                                        <p className="text-xs text-slate-500 mt-1.5">
+                                            Puedes obtener una clave gratuita en <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" className="text-amber-600 dark:text-amber-400 underline font-medium hover:text-amber-700">Google AI Studio</a>. Esta clave habilitará el procesamiento por lenguaje natural inteligente de BakeryAI.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
