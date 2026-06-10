@@ -164,7 +164,7 @@ export default function ProduccionPage() {
                 const dbIng = ingredientesDb.find(i => i.id === ingReq.ingredienteId);
                 if (dbIng) {
                     const totalConsumido = ingReq.cantidad * factor;
-                    const nuevoStock = Math.max(0, dbIng.stockActual - totalConsumido); // Prevent negative stock
+                    const nuevoStock = Number(Math.max(0, dbIng.stockActual - totalConsumido).toFixed(2)); // Prevent negative stock and floating point errors
 
                     // Simple status recalculation
                     let nuevoEstado = dbIng.estado;

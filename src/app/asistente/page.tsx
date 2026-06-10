@@ -372,7 +372,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                 const dbIng = freshIngs.find(i => i.id === ingReq.ingredienteId);
                 if (dbIng) {
                     const totalConsumido = ingReq.cantidad;
-                    const nuevoStock = Math.max(0, dbIng.stockActual - totalConsumido);
+                    const nuevoStock = Number(Math.max(0, dbIng.stockActual - totalConsumido).toFixed(2));
 
                     let nuevoEstado = dbIng.estado;
                     if (nuevoStock <= dbIng.stockMinimo / 2) nuevoEstado = 'alerta';
@@ -412,7 +412,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
         }
 
         const oldStock = matched.stockActual;
-        const newStock = oldStock + amount;
+        const newStock = Number((oldStock + amount).toFixed(2));
         const status = newStock <= matched.stockMinimo ? "bajo" : "ok";
 
         await updateDoc(doc(db, "ingredientes", matched.id!), {
@@ -459,7 +459,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
         }
 
         const oldStock = matched.stockActual;
-        const newStock = Math.max(0, oldStock - amount);
+        const newStock = Number(Math.max(0, oldStock - amount).toFixed(2));
         const status = newStock <= matched.stockMinimo ? "bajo" : "ok";
 
         await updateDoc(doc(db, "ingredientes", matched.id!), {
@@ -739,7 +739,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                 } else {
                     const isAdd = ["añadir", "sumar", "agregar"].includes(action);
                     const oldStock = matched.stockActual;
-                    const newStock = isAdd ? oldStock + amount : Math.max(0, oldStock - amount);
+                    const newStock = Number((isAdd ? oldStock + amount : Math.max(0, oldStock - amount)).toFixed(2));
                     const status = newStock <= matched.stockMinimo ? "bajo" : "ok";
 
                     await updateDoc(doc(db, "ingredientes", matched.id!), {
