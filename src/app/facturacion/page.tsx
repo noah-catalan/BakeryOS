@@ -187,7 +187,13 @@ export default function FacturacionPage() {
 
     const handleDeleteInvoice = async (id: string) => {
         if (confirm("¿Eliminar factura? Esto no se puede deshacer.")) {
-            await deleteDoc(doc(db, "facturas", id));
+            try {
+                await deleteDoc(doc(db, "facturas", id));
+                toast.success("Factura eliminada correctamente.");
+            } catch (error) {
+                console.error("Error deleting invoice:", error);
+                toast.error("Error al eliminar la factura.");
+            }
         }
     };
 

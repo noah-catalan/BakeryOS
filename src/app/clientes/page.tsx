@@ -183,13 +183,25 @@ export default function ClientesPage() {
 
     const handleCompleteOrder = async (id: string) => {
         if (confirm("¿Marcar este pedido como entregado?")) {
-            await updateDoc(doc(db, "pedidosVenta", id), { estado: 'entregado', fechaEntrega: Date.now() });
+            try {
+                await updateDoc(doc(db, "pedidosVenta", id), { estado: 'entregado', fechaEntrega: Date.now() });
+                toast.success("Pedido marcado como entregado.");
+            } catch (error) {
+                console.error("Error completing order:", error);
+                toast.error("Error al completar el pedido.");
+            }
         }
     };
 
     const handleDeleteOrder = async (id: string) => {
         if (confirm("¿Eliminar o cancelar este pedido?")) {
-            await deleteDoc(doc(db, "pedidosVenta", id));
+            try {
+                await deleteDoc(doc(db, "pedidosVenta", id));
+                toast.success("Pedido eliminado correctamente.");
+            } catch (error) {
+                console.error("Error deleting order:", error);
+                toast.error("Error al eliminar el pedido.");
+            }
         }
     };
 

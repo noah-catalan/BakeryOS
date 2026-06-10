@@ -1,0 +1,102 @@
+www.cifpfbmoll.eu
+
+C/ Caracas, 6 - 07007 – PALMA
+Tel. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+Projecte Intermodular – UD2A
+Desenvolupament avançat i professionalització del projecte
+
+Context i objectiu de la unitat
+Aquesta unitat correspon a la fase de desenvolupament avançat del projecte.
+Després d’haver completat la fase inicial (UD1A) i la seva consolidació (UD1B), l’objectiu de la
+UD2A és:
+●​ Continuar el desenvolupament del projecte​
+●​ Millorar la qualitat tècnica i funcional​
+●​ Refinar l’estructura i l’organització​
+●​ Professionalitzar la documentació​
+
+El projecte ha de començar a tenir aspecte de producte real en desenvolupament, no d’exercici
+acadèmic.
+
+Tasques a realitzar
+1. Desenvolupament avançat
+●​ Ampliar funcionalitats existents​
+●​ Incorporar noves funcionalitats​
+●​ Millorar la integració del sistema​
+●​ Reduir l’ús de mocks​
+
+1/4
+
+2. Millora tècnica i estructural
+●​ Refactorització del codi​
+●​ Millora de l’arquitectura​
+●​ Separació de responsabilitats​
+●​ Optimització bàsica​
+
+3. Gestió real del projecte
+●​ Trello actualitzat​
+●​ Tasques reals (no decoratives)​
+●​ Seguiment continuat​
+●​ Ajust de planificació​
+
+4. Documentació professional (OBLIGATÒRIA)
+La documentació:
+●​ Ha d’estar actualitzada respecte al codi​
+●​ Ha d’explicar el funcionament real​
+●​ Ha d’incloure:​
+○​ decisions tècniques pròpies​
+○​ problemes trobats​
+○​ solucions aplicades​
+○​ evolució del projecte​
+
+2/4
+
+Ha de poder ser entesa per una persona externa.
+
+Condició obligatòria
+Una entrega sense documentació actualitzada es considerarà incompleta i NO serà avaluada.
+
+Defensa tècnica
+L’alumne haurà de saber explicar:
+●​ què ha fet​
+●​ com funciona​
+●​ per què ho ha fet així​
+
+Entregables
+●​ Repositori GitHub actualitzat​
+●​ Documentació del projecte (PDF o Markdown)​
+●​ Trello actualitzat​
+●​ Demostració funcional​
+
+Criteris d’avaluació
+
+Aspecte
+
+Pes
+
+Evolució del desenvolupament
+
+30%
+
+3/4
+
+Qualitat tècnica
+
+20%
+
+Documentació
+
+25%
+
+Gestió projecte
+
+15%
+
+Defensa
+
+10%
+
+4/4
+
+

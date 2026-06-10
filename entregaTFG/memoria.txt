@@ -1,0 +1,603 @@
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+Optimización de la gestión
+en el sector de la
+panadería
+Creación de un ERP para Panaderías
+
+Autor:
+
+Noah Catalán Rosell
+
+Centro:
+
+CIFP Francesc de Borja Moll
+
+Tutor:
+
+Miquel Antoni Capellà Arrom
+
+Ciclo Formativo:
+
+Desarrollo de aplicaciones web
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+1.​ Índice
+1. Índice........................................................................................................................................ 2
+2. Título provisional del proyecto.............................................................................................. 3
+3. Introducción y contexto.......................................................................................................... 3
+3.1. Problemática y oportunidad.............................................................................................. 3
+3.2. Objetivos del proyecto...................................................................................................... 3
+4. Impacto y aspectos éticos...................................................................................................... 4
+4.1. Sostenibilidad y Accesibilidad...........................................................................................4
+4.2. Usabilidad y Diversidad.................................................................................................... 4
+4.3. Protección de Datos y Licenciamiento..............................................................................4
+5. Metodología y herramientas................................................................................................... 5
+5.1. Metodología de Desarrollo................................................................................................5
+5.2. Arquitectura Tecnológica y Herramientas......................................................................... 5
+6. Planificación inicial................................................................................................................. 6
+6.1. Fases del Proyecto y Cronograma................................................................................... 6
+6.2. Diagrama de Gantt........................................................................................................... 7
+7. Alcance y funcionalidades previstas.....................................................................................8
+7.1. Funcionalidades Principales por Módulo.......................................................................... 8
+7.2. Esquema de Funcionalidades (Tabla Resumen).............................................................. 9
+8. Entorno de trabajo y mockups............................................................................................. 10
+8.1. Enlaces a los Entornos de Trabajo................................................................................. 10
+8.2. Metodología y Funcionamiento del Equipo..................................................................... 11
+8.3. Diseño de la Interfaz (Mockups)..................................................................................... 11
+9. Desarrollo inicial....................................................................................................................14
+9.1. Entorno de Desarrollo y Despliegue............................................................................... 14
+9.2. Funcionalidades Implementadas (Sprint 1).................................................................... 15
+9.3. Gestión del Proyecto y Planificación.............................................................................. 15
+9.4. Funcionalidades Implementadas (Sprint 2).................................................................... 16
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+2.​ Título provisional del proyecto
+BakeryOS: un ERP para la gestión de panaderías.
+
+3.​ Introducción y contexto
+3.1.​
+
+Problemática y oportunidad
+La inspiración para este proyecto nace de la experiencia personal.
+Como cliente habitual durante años de la panadería de mi barrio, he podido
+observar las dificultades operativas a las que se enfrentan diariamente. A pesar
+de ofrecer un producto de alta calidad, muchos de estos pequeños negocios
+todavía dependen de métodos de gestión manuales como libretas, pizarras y
+hojas de cálculo dispersas para procesos que son críticos para su negocio.
+Esta dependencia de métodos anticuados genera ineficiencias que limitan su
+rentabilidad y potencial de crecimiento. La problemática principal se puede dividir
+en tres puntos:
+●​ Control de inventario y producción: la falta de un sistema centralizado
+y digital de gestión permite que se produzcan pérdidas debido a excesos
+de producción o de compra.
+●​ Cálculo de costes: Sin una herramienta para gestionar recetas de
+manera automática es muy difícil para estos negocios conocer el coste
+real de cada producto y fijar un precio de venta real y estratégico.
+●​ Gestión administrativa y de pedidos: Tareas como la facturación a
+clientes recurrentes o el seguimiento de pedidos se convierten en un
+proceso tedioso y propenso a errores, automatizando estos procesos
+podríamos evitarlo
+Por eso, vi una oportunidad clara para desarrollar un software sencillo y centrado
+en la facilidad de uso, que les ayude a optimizar y centralizar esos procesos tan
+tediosos.
+
+3.2.​
+
+Objetivos del proyecto
+El objetivo principal de este proyecto es desarrollar una aplicación web funcional
+y fácil de usar que permita a las panaderías artesanales digitalizar la gestión de
+su inventario, producción y pedidos.
+Dividiéndolo por objetivos específicos:
+●​ Implementar un módulo de inventario para la gestión de materias
+primas y productos terminados, que permita registrar entradas, salidas y
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+visualizar el stock en tiempo real.
+●​ Crear un sistema de recetas que asocie ingredientes a productos,
+permitiendo un cálculo de costes básico y la planificación de la
+producción.
+●​ Desarrollar un módulo de clientes y pedidos para registrar,programar
+y dar seguimiento a las ventas, especialmente las dirigidas a otros
+negocios.
+●​ Diseñar una interfaz de usuario limpia, intuitiva y responsive,
+asegurando que la aplicación sea fácil de usar para personas con un
+perfil técnico bajo.
+●​ Explorar la implementación de una interfaz de control por lenguaje
+natural. Como funcionalidad avanzada, se investigará y desarrollará un
+prototipo de asistente (vía chat o voz) que permita ejecutar acciones
+simples dentro de la aplicación (ej. "añadir 5 barras al stock"), mejorando
+radicalmente la accesibilidad y la rapidez de uso para el usuario final.
+
+4.​ Impacto y aspectos éticos
+4.1.​
+
+Sostenibilidad y Accesibilidad
+Sostenibilidad:
+Además, este proyecto tiene un impacto sostenible. Por un lado, reduce el uso
+de papel en albaranes y facturas. Por otro, ayuda a minimizar el desperdicio de
+alimentos, algo que considero muy importante y que, de hecho, se alinea con
+objetivos globales como el ODS 12 de la Agenda 2030.
+Accesibilidad:
+Se buscará que la aplicación cumpla con las pautas de accesibilidad web. Para
+decirlo claro: la idea es que cualquiera pueda usarla. Esto se traduce en
+decisiones técnicas concretas como el uso de HTML semántico y asegurar un
+buen contraste de colores en el diseño.
+
+4.2.​
+
+Usabilidad y Diversidad
+Este es uno de los pilares del proyecto. El usuario de BakeryOS no es un
+experto en informática, es un panadero, por lo tanto, la interfaz será minimalista
+y sencilla. La funcionalidad del asistente por lenguaje natural que se pretende
+explorar es parte de esta intención. Permitir que un usuario actualice el stock
+diciendo "quita 3 napolitanas" en lugar de buscar en menús es llevar la facilidad
+de uso a otro nivel, eliminando la barrera tecnológica.
+
+4.3.​
+
+Protección de Datos y Licenciamiento
+La aplicación manejará datos sensibles (información de clientes, facturación).
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+Por ello, la seguridad y el cumplimiento del Reglamento General de Protección
+de Datos son prioridad. Se utilizarán los servicios de Google Cloud / Firebase,
+que cumplen con los más altos estándares de seguridad y ofrecen herramientas
+para gestionar el RGPD. Se implementarán medidas técnicas robustas:
+●​ Contraseñas: Se usará Firebase Authentication, que gestiona de forma
+segura todo el ciclo de vida de los usuarios, almacenando credenciales
+con hashing y salting de nivel industrial.
+●​ Acceso a datos: Se configurarán las reglas de seguridad de Firestore
+para definir permisos de acceso a nivel granular, asegurando que un
+usuario solo pueda leer o escribir los datos que le corresponden.
+●​ Seguridad: El ecosistema serverless y las buenas prácticas en el
+desarrollo con Next.js prevendrán vulnerabilidades comunes como la
+inyección de código o el XSS.
+
+5.​ Metodología y herramientas
+Para llevar a cabo este proyecto de manera organizada y con las tecnologías más
+actuales, se ha definido una metodología de trabajo ágil y un conjunto de herramientas
+de desarrollo que garantizan un resultado moderno y profesional.
+
+5.1.​
+
+Metodología de Desarrollo
+He decidido usar la metodología Scrum para este proyecto. En lugar de intentar
+construirlo todo de golpe, dividiré el trabajo en sprints de dos semanas.
+Al final de cada sprint, el objetivo es tener una pequeña parte de la aplicación
+funcionando. Este enfoque permite ser flexible, adaptar el proyecto si surgen
+nuevas ideas (como la del asistente de voz) y asegurarse de que se avanza a
+buen ritmo. Para organizar las tareas, se usará el tablero tipo Kanban de Jira
+para visualizar qué está pendiente, qué se está haciendo y qué está terminado.
+
+5.2.​
+
+Arquitectura Tecnológica y Herramientas
+Se ha elegido un stack tecnológico basado en TypeScript y un enfoque
+"serverless", priorizando la modernidad, la velocidad de desarrollo y la fuerte
+integración con herramientas de asistencia por IA como GitHub Copilot. La
+decisión de utilizar los servicios de Google Cloud y Firebase se apoya en mi
+experiencia laboral previa con este ecosistema, lo que me proporciona una base
+sólida y confianza para construir un proyecto robusto y escalable.
+●​ Lenguaje: TypeScript
+○​ Se usará TypeScript en todo el proyecto (tanto en el frontend
+como en el backend). A diferencia de JavaScript normal,
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+●​
+
+●​
+
+●​
+
+●​
+
+TypeScript nos obliga a definir el tipo de datos que usamos
+(números, texto, etc.), lo que ayuda a evitar muchos errores
+comunes y facilita que herramientas como Copilot entiendan
+mejor el código para ofrecer mejores sugerencias.
+Frontend: Next.js (React)
+○​ La parte visible de la aplicación se construirá con React dada su
+popularidad para crear interfaces de usuario. En concreto, se
+usará el framework Next.js, que es el estándar actual.
+Backend y Base de Datos: Firebase (Ecosistema Google)
+○​ Para el backend, se optará por una arquitectura "serverless". Mi
+experiencia me permite ser más eficiente y centrarme en el
+desarrollo de funcionalidades en lugar de en la configuración de
+servidores. Se usará:
+■​ Firestore: Como base de datos. Es una base de datos
+NoSQL muy flexible y rápida.
+■​ Firebase Authentication: Para gestionar todo lo
+relacionado con los usuarios (registro, inicio de sesión con
+email/contraseña, etc.) de forma segura y sencilla.
+■​ Cloud Functions: Para la lógica más compleja del
+backend. Serán pequeñas funciones en TypeScript que se
+ejecutarán en la nube solo cuando sea necesario.
+Estilos: Tailwind CSS
+○​ Para el diseño visual de la aplicación, se usará Tailwind CSS. Es
+una forma moderna y rápida de aplicar estilos directamente en el
+HTML, sin tener que escribir archivos CSS por separado.
+Control de Versiones: Git y GitHub
+
+6.​ Planificación inicial
+6.1.​
+
+Fases del Proyecto y Cronograma
+Para asegurar un desarrollo estructurado y cumplir con los plazos de entrega, el
+proyecto se ha dividido en cinco fases principales. Esta planificación sigue un
+enfoque donde cada fase construye sobre la anterior, permitiendo un avance
+constante y controlado desde la concepción hasta la entrega final del proyecto.
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+Fase
+
+Descripción
+
+Fechas estimadas
+
+Fase 1: Análisis, Diseño y Definición final de requisitos. Diseño de la estructura
+Configuración
+de datos en Firestore. Creación de wireframes de la
+interfaz. Configuración del entorno de desarrollo
+(Next.js, Firebase).
+
+Nov 2025 - Dic 2025
+
+Fase 2: Desarrollo del
+Núcleo y Servicios Base
+
+Implementación del sistema de autenticación con
+Firebase Auth. Creación de las funciones y reglas de
+seguridad para la gestión del inventario y productos.
+
+Ene 2026 - Feb 2026
+
+Fase 3: Implementación
+del Frontend
+
+Desarrollo de los componentes de React para la
+interfaz de usuario (gestión de stock, recetas,
+clientes). Conexión del frontend con los servicios de
+Firebase.
+
+Marzo 2026
+
+Fase 4: Funcionalidades
+Avanzadas y Pruebas
+
+Desarrollo del módulo de pedidos y facturación
+simple. Implementación del prototipo de asistente por
+lenguaje natural. Realización de pruebas de
+usabilidad y corrección de errores.
+
+Abr 2026 - May 2026
+
+Fase 5: Documentación y Redacción de la memoria final del proyecto,
+Entrega Final
+incluyendo los resultados obtenidos y las
+conclusiones. Preparación de la presentación para la
+defensa final.
+
+6.2.​
+
+Diagrama de Gantt
+
+Junio 2026
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+7.​ Alcance y funcionalidades previstas
+7.1.​
+
+Funcionalidades Principales por Módulo
+La aplicación se organizará en los siguientes módulos principales:
+●​ Módulo de Panel de Control (Dashboard):
+○​ Será la pantalla de inicio al entrar en la aplicación. Mostrará un
+resumen visual de la información más importante del día:
+producción planificada, pedidos pendientes de preparar y alertas
+de stock bajo para que el usuario pueda ver el estado de su
+negocio de un vistazo.
+●​ Módulo de Inventario:
+○​ El núcleo de la gestión. Permitirá dar de alta, modificar y eliminar
+tanto materias primas (harina, levadura) como productos
+terminados (barras de pan, napolitanas). El stock se actualizará
+automáticamente con la producción y las ventas.
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+●​ Módulo de Producción:
+○​ Aquí se gestionan las recetas, definiendo qué ingredientes y en
+qué cantidad son necesarios para cada producto. También incluirá
+un planificador para que el usuario pueda definir qué productos y
+qué cantidades va a hornear cada día.
+●​ Módulo de Clientes y Pedidos:
+○​ Permitirá gestionar una base de datos de clientes, especialmente
+enfocada en negocios recurrentes. Se podrán crear y gestionar
+tanto pedidos puntuales como pedidos programados, una
+funcionalidad clave para clientes fijos (ej. una cafetería que pide
+"20 cruasanes cada día de lunes a viernes").
+●​ Módulo de Facturación:
+○​ Una herramienta sencilla pero potente para automatizar la
+administración. Permitirá agrupar los albaranes o pedidos
+completados de un cliente en un período determinado (ej.
+mensual) y generar una factura simplificada en formato PDF, lista
+para ser enviada.
+●​ Módulo de Configuración:
+○​ Un apartado básico para que el administrador pueda gestionar los
+usuarios de la aplicación (crear, eliminar) y configurar los datos
+básicos de la panadería.
+●​ Funcionalidad Avanzada: Asistente por Lenguaje Natural:
+○​ Se explorará la creación de un prototipo de asistente que permita
+al usuario ejecutar comandos sencillos para interactuar con la
+aplicación (ej: "Añade 10 barras al stock" o "Busca el cliente
+'Cafetería Central'").
+
+7.2.​
+
+Esquema de Funcionalidades (Tabla Resumen)
+
+Módulo
+
+Funcionalidad
+
+Descripción Breve
+
+Dashboard
+
+Vista General
+
+Resumen visual de la
+actividad diaria y alertas
+importantes.
+
+Inventario
+
+Gestión de Ítems
+
+Permite crear, editar y
+eliminar ingredientes y
+productos terminados.
+
+Control de Stock
+
+Registro de entradas y
+salidas de stock con
+actualización automática.
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+Producción
+
+Gestión de Recetas
+
+Crea las "fórmulas" de cada
+producto (escandallos).
+
+Planificador de Producción Herramienta para organizar
+la producción diaria o
+semanal.
+Clientes y Pedidos
+
+Gestión de Clientes
+
+Base de datos con la
+información de los clientes.
+
+Gestión de Pedidos
+
+Creación de pedidos
+puntuales y programación de
+pedidos recurrentes.
+
+Facturación
+
+Generación de Facturas
+
+Creación de facturas en PDF
+a partir de los pedidos
+completados de un cliente.
+
+Asistente IA
+
+Control por Lenguaje
+Natural
+
+Interfaz de chat o voz para
+ejecutar acciones rápidas
+mediante comandos
+sencillos.
+
+8.​ Entorno de trabajo y mockups
+8.1.​
+
+Enlaces a los Entornos de Trabajo
+
+Para esta segunda entrega, se han configurado los entornos de desarrollo y
+gestión del proyecto siguiendo las metodologías ágiles y las buenas prácticas de
+control de versiones.
+●​ Repositorio GitHub: https://github.com/noah-catalan/BakeryOS
+
+●​ Tablero Trello:
+https://trello.com/invite/b/692f69bab074d10d74744f6d/ATTI8f9e5e8ae58877b786
+eae85723d4f0282A945F51/bakeryos
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+○​ Estado: Tablero Kanban configurado con columnas (Backlog, En Curso,
+Hecho) y tareas iniciales de planificación y diseño creadas.
+
+8.2.​
+
+Metodología y Funcionamiento del Equipo
+
+Aunque el proyecto se desarrolla de forma individual, se simula un entorno de
+equipo profesional utilizando la metodología Scrum adaptada:
+●​ Gestión de Tareas: Se utiliza Trello para visualizar el flujo de trabajo. Las tareas
+se mueven de izquierda a derecha según su estado.
+●​ Sprints: Se ha dividido el desarrollo en bloques de trabajo de dos semanas
+(Sprints). Actualmente estamos cerrando el Sprint 0 (Configuración y Diseño).
+●​ Control de Versiones: Se utilizará la estrategia Git Flow simplificada (rama main
+para producción y ramas feature/ para cada nueva funcionalidad), asegurando
+que el código en el repositorio siempre sea funcional.
+
+8.3.​
+
+Diseño de la Interfaz (Mockups)​
+
+Se ha diseñado una interfaz de usuario (UI) moderna, limpia y orientada a la
+usabilidad, pensando en usuarios no técnicos (panaderos). A continuación, se
+presentan las pantallas principales:
+1.​ Dashboard (Panel de Control): Vista general con KPIs diarios, alertas de stock
+crítico y producción en curso.
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+2.​ Gestión de Inventario: Listado de materias primas con semáforo de estado
+(stock bajo/ok) y gestión de lotes.
+
+3.​ Producción y Recetas: Planificador diario y detalle de recetas para el cálculo de
+costes.
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+4.​ Clientes y Pedidos: Gestión CRM simplificada para control de pedidos
+recurrentes y puntuales.
+
+5.​ Facturación: Gestión de la facturación mensual y por pedidos
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+9.​ Desarrollo inicial
+9.1.​
+
+Entorno de Desarrollo y Despliegue
+
+Se ha configurado un entorno de desarrollo profesional y moderno:
+●​ Stack Tecnológico: El proyecto ha sido inicializado utilizando Next.js (App
+Router) y React, con TypeScript para garantizar un tipado estricto y Tailwind
+CSS para la maquetación visual.
+●​ Backend y Base de Datos: Se ha integrado satisfactoriamente el SDK de
+Firebase. Se ha configurado Firebase Authentication para la seguridad y
+Firestore como base de datos NoSQL en tiempo real.
+●​ Integración Continua (CI/CD): El código se gestiona a través de GitHub y se ha
+enlazado con Vercel. Actualmente, cada commit en la rama principal dispara un
+despliegue automático.
+●​ Live Demo: El entorno de producción actual es accesible públicamente en:
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+https://bakery-os-ten.vercel.app/
+○​ A través de las claves:
+■​ “admin@bakeryos.com”
+■​ “admin123”
+
+9.2.​
+
+Funcionalidades Implementadas (Sprint 1)
+
+Se ha desarrollado la estructura base y la primera funcionalidad crítica ("Core") del
+sistema:
+●​ Layout y Navegación: Implementación del diseño "Dashboard" con barra lateral
+retráctil, "Active States" y diseño responsive calcado de los mockups iniciales.
+●​ Módulo de Autenticación: Protección de rutas (Route Guards) que impiden el
+acceso a usuarios no identificados, redirigiéndolos al portal de Login.
+●​ Módulo de Inventario (CRUD Completo): Creación de la funcionalidad
+principal de gestión de stock. La tabla interactúa bidireccionalmente con
+Firestore, permitiendo la lectura en tiempo real y la creación de nuevas materias
+primas.
+●​ Generación de Datos (Seeding): Se ha implementado un script para poblar la
+base de datos con información realista (ingredientes, recetas y clientes) para
+facilitar la evaluación del prototipo.
+
+9.3.​
+
+Gestión del Proyecto y Planificación
+
+●​ Control de Versiones: Uso constante de Git/GitHub, realizando commits descriptivos
+de cada funcionalidad.
+●​ Seguimiento Ágil: El tablero de Trello se ha mantenido actualizado diariamente,
+reflejando el flujo real del trabajo (Backlog -> Pendiente -> Doing -> Done).
+●​ Revisión de Planificación: El desarrollo avanza según lo estipulado en el cronograma
+original. El Sprint 1 se da por cerrado exitosamente y el equipo se encuentra preparado
+para iniciar el Sprint 2 (Módulo de Producción y Recetas).
+
+www.cifpfbmoll.eu
+C/ Caracas, 6 - 07007 – PALMA
+Tef. 971278150
+cifpfrancescdeborjamoll@educaib.eu
+
+9.4.​
+
+Funcionalidades Implementadas (Sprint 2)
+
+En esta etapa se ha priorizado la experiencia de usuario (UX) y el refinamiento de la
+lógica de datos para asegurar un entorno de trabajo robusto y personalizado:
+●​ Personalización de Interfaz (Modo Oscuro): Implementación de un sistema de
+temas dinámico mediante variables de CSS/Tailwind. Se ha añadido un
+interruptor (toggle) en el layout que permite alternar entre modo claro y oscuro,
+persistiendo la elección del usuario en el almacenamiento local (Local Storage).
+●​ Gestión de Perfil de Usuario: Integración de avatares dinámicos en la barra de
+navegación. El sistema ahora permite la carga y visualización de imágenes de
+perfil vinculadas a la cuenta del usuario, gestionando el almacenamiento de
+archivos a través de Firebase Storage.
+●​ Optimización de Precisión Numérica: Corrección del motor de cálculo para
+prevenir errores de redondeo en coma flotante. Se ha estandarizado el manejo
+de decimales en los campos de inventario y costes, asegurando que las
+operaciones financieras y de stock sean exactas.
+●​ Refinamiento de Inputs de Cantidad: Ajuste de la lógica de los controles
+incrementales (steppers). Se ha corregido el comportamiento de las flechas de
+aumento/disminución para que respeten los límites de stock mínimo y los pasos
+de unidad definidos, eliminando saltos de valores erróneos.
+
+

@@ -143,7 +143,13 @@ export default function ProduccionPage() {
     };
 
     const handleStartOrder = async (id: string) => {
-        await updateDoc(doc(db, "ordenesProduccion", id), { estado: 'enProceso' });
+        try {
+            await updateDoc(doc(db, "ordenesProduccion", id), { estado: 'enProceso' });
+            toast.success("Orden de producción iniciada.");
+        } catch (error) {
+            console.error("Error starting order:", error);
+            toast.error("Error al iniciar la orden de producción.");
+        }
     };
 
     const handleCompleteOrder = async (order: ProductionOrder) => {

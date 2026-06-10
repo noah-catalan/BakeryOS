@@ -23,6 +23,7 @@ export default function InventarioPage() {
         categoria: "Harinas",
         stockActual: 0,
         stockMinimo: 0,
+        unidad: "kg",
         estado: "ok" as 'ok' | 'bajo' | 'alerta',
     });
 
@@ -65,6 +66,7 @@ export default function InventarioPage() {
                 categoria: formData.categoria,
                 stockActual: Number(formData.stockActual),
                 stockMinimo: Number(formData.stockMinimo),
+                unidad: formData.unidad,
                 estado: calculateStatus(Number(formData.stockActual), Number(formData.stockMinimo)),
                 ultimaAct: Date.now(),
                 userId: user?.uid
@@ -82,7 +84,7 @@ export default function InventarioPage() {
 
             toast.success(editingIngId ? "Ingrediente actualizado correctamente." : "Ingrediente guardado correctamente.");
             setEditingIngId(null);
-            setFormData({ nombre: "", SKU: "", categoria: "Harinas", stockActual: 0, stockMinimo: 0, estado: "ok" });
+            setFormData({ nombre: "", SKU: "", categoria: "Harinas", stockActual: 0, stockMinimo: 0, unidad: "kg", estado: "ok" });
             setShowForm(false);
         } catch (error) {
             console.error("Error saving ingredient: ", error);
@@ -98,6 +100,7 @@ export default function InventarioPage() {
             categoria: ing.categoria,
             stockActual: ing.stockActual,
             stockMinimo: ing.stockMinimo,
+            unidad: ing.unidad || "kg",
             estado: ing.estado,
         });
         setShowForm(true);
@@ -118,7 +121,7 @@ export default function InventarioPage() {
     const resetForm = () => {
         setShowForm(false);
         setEditingIngId(null);
-        setFormData({ nombre: "", SKU: "", categoria: "Harinas", stockActual: 0, stockMinimo: 0, estado: "ok" });
+        setFormData({ nombre: "", SKU: "", categoria: "Harinas", stockActual: 0, stockMinimo: 0, unidad: "kg", estado: "ok" });
     };
 
     return (
@@ -141,7 +144,7 @@ export default function InventarioPage() {
             {showForm && (
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 mb-8 shadow-sm animate-slide-down">
                     <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-slate-50">{editingIngId ? 'Editar Ingrediente' : 'Añadir Ingrediente'}</h3>
-                    <form onSubmit={handleSaveIngredient} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <form onSubmit={handleSaveIngredient} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                         <div>
                             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Nombre</label>
                             <input required type="text" value={formData.nombre} onChange={e => setFormData({ ...formData, nombre: e.target.value })} className="w-full rounded-xl border-0 py-2 px-3 text-sm ring-1 ring-inset ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-amber-500 outline-none transition-all" />
@@ -153,6 +156,10 @@ export default function InventarioPage() {
                         <div>
                             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Categoría</label>
                             <input required type="text" value={formData.categoria} onChange={e => setFormData({ ...formData, categoria: e.target.value })} className="w-full rounded-xl border-0 py-2 px-3 text-sm ring-1 ring-inset ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-amber-500 outline-none transition-all" />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Unidad</label>
+                            <input required type="text" value={formData.unidad} onChange={e => setFormData({ ...formData, unidad: e.target.value })} className="w-full rounded-xl border-0 py-2 px-3 text-sm ring-1 ring-inset ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-amber-500 outline-none transition-all" placeholder="kg, g, L, uds" />
                         </div>
                         <div className="flex space-x-2">
                             <div className="w-1/2">
@@ -216,7 +223,7 @@ export default function InventarioPage() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono text-xs">{ing.SKU}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">{ing.categoria}</td>
                                     <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-slate-50 text-center">
-                                        {ing.stockActual} <span className="text-slate-400 font-normal">/ {ing.stockMinimo}</span>
+                                        {ing.stockActual} <span className="text-slate-400 font-normal">{ing.unidad || 'kg'} / {ing.stockMinimo} {ing.unidad || 'kg'}</span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider
