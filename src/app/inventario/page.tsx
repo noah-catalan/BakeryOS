@@ -52,8 +52,10 @@ export default function InventarioPage() {
     }, [user]);
 
     const calculateStatus = (current: number, min: number) => {
-        if (current <= 0) return "alerta";
-        if (current <= min) return "bajo";
+        const roundedCurrent = Number(Number(current || 0).toFixed(2));
+        const roundedMin = Number(Number(min || 0).toFixed(2));
+        if (roundedCurrent <= 0) return "alerta";
+        if (roundedCurrent <= roundedMin) return "bajo";
         return "ok";
     };
 
@@ -64,8 +66,8 @@ export default function InventarioPage() {
                 nombre: formData.nombre,
                 SKU: formData.SKU,
                 categoria: formData.categoria,
-                stockActual: Number(formData.stockActual),
-                stockMinimo: Number(formData.stockMinimo),
+                stockActual: Number(Number(formData.stockActual || 0).toFixed(2)),
+                stockMinimo: Number(Number(formData.stockMinimo || 0).toFixed(2)),
                 unidad: formData.unidad,
                 estado: calculateStatus(Number(formData.stockActual), Number(formData.stockMinimo)),
                 ultimaAct: Date.now(),
@@ -223,7 +225,7 @@ export default function InventarioPage() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-mono text-xs">{ing.SKU}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">{ing.categoria}</td>
                                     <td className="px-5 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-slate-50 text-center">
-                                        {ing.stockActual} <span className="text-slate-400 font-normal">{ing.unidad || 'kg'} / {ing.stockMinimo} {ing.unidad || 'kg'}</span>
+                                        {Number((ing.stockActual || 0).toFixed(2))} <span className="text-slate-400 font-normal">{ing.unidad || 'kg'} / {Number((ing.stockMinimo || 0).toFixed(2))} {ing.unidad || 'kg'}</span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider

@@ -165,7 +165,7 @@ export default function AsistentePage() {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeApiKey}`;
         
         // Build database context
-        const ingContext = ingredientes.map(i => `- ${i.nombre} (ID: ${i.id}): stockActual: ${i.stockActual} ${i.unidad || "kg"} (mínimo: ${i.stockMinimo})`).join("\n");
+        const ingContext = ingredientes.map(i => `- ${i.nombre} (ID: ${i.id}): stockActual: ${Number((i.stockActual || 0).toFixed(2))} ${i.unidad || "kg"} (mínimo: ${Number((i.stockMinimo || 0).toFixed(2))})`).join("\n");
         const recContext = recetas.map(r => `- ${r.nombre} (ID: ${r.id}): rinde ${r.rendimiento} uds, coste de producción: ${r.costeProduccion}€`).join("\n");
         
         const systemPrompt = `Eres BakeryAI, el asistente virtual y maestro panadero de BakeryOS. Tu objetivo es ayudar al usuario a gestionar su almacén y catálogo de producción.
@@ -375,8 +375,9 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                     const nuevoStock = Number(Math.max(0, dbIng.stockActual - totalConsumido).toFixed(2));
 
                     let nuevoEstado = dbIng.estado;
-                    if (nuevoStock <= dbIng.stockMinimo / 2) nuevoEstado = 'alerta';
-                    else if (nuevoStock <= dbIng.stockMinimo) nuevoEstado = 'bajo';
+                    const minStock = Number(Number(dbIng.stockMinimo || 0).toFixed(2));
+                    if (nuevoStock <= minStock / 2) nuevoEstado = 'alerta';
+                    else if (nuevoStock <= minStock) nuevoEstado = 'bajo';
                     else nuevoEstado = 'ok';
 
                     batch.update(doc(db, "ingredientes", dbIng.id!), {
@@ -413,7 +414,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
 
         const oldStock = matched.stockActual;
         const newStock = Number((oldStock + amount).toFixed(2));
-        const status = newStock <= matched.stockMinimo ? "bajo" : "ok";
+        const status = newStock <= Number(Number(matched.stockMinimo || 0).toFixed(2)) ? "bajo" : "ok";
 
         await updateDoc(doc(db, "ingredientes", matched.id!), {
             stockActual: newStock,
@@ -435,7 +436,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5">{matched.nombre}</p>
                     </div>
                     <div className="text-right">
-                        <span className="text-[10px] text-slate-400 font-medium">{oldStock} →</span>
+                        <span className="text-[10px] text-slate-400 font-medium">{Number((oldStock || 0).toFixed(2))} →</span>
                         <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400">{newStock} {matched.unidad || 'kg'}</p>
                     </div>
                 </div>
@@ -460,7 +461,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
 
         const oldStock = matched.stockActual;
         const newStock = Number(Math.max(0, oldStock - amount).toFixed(2));
-        const status = newStock <= matched.stockMinimo ? "bajo" : "ok";
+        const status = newStock <= Number(Number(matched.stockMinimo || 0).toFixed(2)) ? "bajo" : "ok";
 
         await updateDoc(doc(db, "ingredientes", matched.id!), {
             stockActual: newStock,
@@ -482,7 +483,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5">{matched.nombre}</p>
                     </div>
                     <div className="text-right">
-                        <span className="text-[10px] text-slate-400 font-medium">{oldStock} →</span>
+                        <span className="text-[10px] text-slate-400 font-medium">{Number((oldStock || 0).toFixed(2))} →</span>
                         <p className="text-lg font-extrabold text-red-600 dark:text-red-400">{newStock} {matched.unidad || 'kg'}</p>
                     </div>
                 </div>
@@ -523,7 +524,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                     <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mt-2">{newIng.nombre}</h4>
                     <div className="mt-3 flex justify-between text-xs text-slate-500">
                         <span>SKU: {newIng.SKU}</span>
-                        <span>Stock Mínimo: {newIng.stockMinimo} {newIng.unidad}</span>
+                        <span>Stock Mínimo: {Number((newIng.stockMinimo || 0).toFixed(2))} {newIng.unidad}</span>
                     </div>
                 </div>
             )
@@ -664,10 +665,10 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                                     <div key={ing.id} className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl flex justify-between items-center">
                                         <div>
                                             <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{ing.nombre}</p>
-                                            <p className="text-xs text-red-500">Mínimo: {ing.stockMinimo} {ing.unidad || 'kg'}</p>
+                                            <p className="text-xs text-red-500">Mínimo: {Number((ing.stockMinimo || 0).toFixed(2))} {ing.unidad || 'kg'}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm font-extrabold text-red-600 dark:text-red-400">{ing.stockActual} {ing.unidad || 'kg'}</p>
+                                            <p className="text-sm font-extrabold text-red-600 dark:text-red-400">{Number((ing.stockActual || 0).toFixed(2))} {ing.unidad || 'kg'}</p>
                                             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 uppercase">Reabastecer</span>
                                         </div>
                                     </div>
@@ -740,7 +741,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                     const isAdd = ["añadir", "sumar", "agregar"].includes(action);
                     const oldStock = matched.stockActual;
                     const newStock = Number((isAdd ? oldStock + amount : Math.max(0, oldStock - amount)).toFixed(2));
-                    const status = newStock <= matched.stockMinimo ? "bajo" : "ok";
+                    const status = newStock <= Number(Number(matched.stockMinimo || 0).toFixed(2)) ? "bajo" : "ok";
 
                     await updateDoc(doc(db, "ingredientes", matched.id!), {
                         stockActual: newStock,
@@ -762,7 +763,7 @@ Responde ÚNICAMENTE con el objeto JSON para poder parsearlo directamente.`;
                                     <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5">{matched.nombre}</p>
                                 </div>
                                 <div className="text-right">
-                                    <span className="text-[10px] text-slate-400 font-medium">{oldStock} →</span>
+                                    <span className="text-[10px] text-slate-400 font-medium">{Number((oldStock || 0).toFixed(2))} →</span>
                                     <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400">{newStock} {matched.unidad || 'kg'}</p>
                                 </div>
                             </div>

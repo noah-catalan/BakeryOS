@@ -144,8 +144,8 @@ export default function Home() {
     const qInventario = query(collection(db, "ingredientes"), where("userId", "==", user.uid));
     const unsubscribeInventario = onSnapshot(qInventario, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Ingredient[];
-      const kriticos = data.filter(ing => ing.stockActual <= ing.stockMinimo);
-      kriticos.sort((a, b) => (a.stockActual / a.stockMinimo) - (b.stockActual / b.stockMinimo));
+      const kriticos = data.filter(ing => Number(Number(ing.stockActual || 0).toFixed(2)) <= Number(Number(ing.stockMinimo || 0).toFixed(2)));
+      kriticos.sort((a, b) => (Number(Number(a.stockActual || 0).toFixed(2)) / Number(Number(a.stockMinimo || 0).toFixed(2))) - (Number(Number(b.stockActual || 0).toFixed(2)) / Number(Number(b.stockMinimo || 0).toFixed(2))));
       setAlertasStock(kriticos);
       setLoading(false);
     });
@@ -375,10 +375,10 @@ export default function Home() {
                   <li key={ing.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 flex flex-col transition-colors border-l-4 border-red-400 dark:border-red-500">
                     <div className="flex justify-between items-start">
                       <p className="font-semibold text-slate-800 dark:text-slate-50 text-sm">{ing.nombre}</p>
-                      <p className="font-bold text-red-600 dark:text-red-400">{ing.stockActual} <span className="text-xs font-normal">{ing.unidad}</span></p>
+                      <p className="font-bold text-red-600 dark:text-red-400">{Number((ing.stockActual || 0).toFixed(2))} <span className="text-xs font-normal">{ing.unidad}</span></p>
                     </div>
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">Min: {ing.stockMinimo} {ing.unidad}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">Min: {Number((ing.stockMinimo || 0).toFixed(2))} {ing.unidad}</span>
                       <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Bajo Mínimos</span>
                     </div>
                   </li>

@@ -174,8 +174,9 @@ export default function ProduccionPage() {
 
                     // Simple status recalculation
                     let nuevoEstado = dbIng.estado;
-                    if (nuevoStock <= dbIng.stockMinimo / 2) nuevoEstado = 'alerta';
-                    else if (nuevoStock <= dbIng.stockMinimo) nuevoEstado = 'bajo';
+                    const minStock = Number(Number(dbIng.stockMinimo || 0).toFixed(2));
+                    if (nuevoStock <= minStock / 2) nuevoEstado = 'alerta';
+                    else if (nuevoStock <= minStock) nuevoEstado = 'bajo';
                     else nuevoEstado = 'ok';
 
                     batch.update(doc(db, "ingredientes", dbIng.id!), {
